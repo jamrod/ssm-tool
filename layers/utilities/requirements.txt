@@ -1,0 +1,12 @@
+attrs==22.1.0
+aws-cdk-lib==2.47.0
+aws-cdk.aws-lambda-python-alpha==2.38.1a0
+cattrs==22.2.0
+constructs==10.1.140
+exceptiongroup==1.0.0rc9
+jsii==1.70.0
+publication==0.0.3
+python-dateutil==2.8.2
+six==1.16.0
+typeguard==2.13.3
+typing_extensions==4.4.0

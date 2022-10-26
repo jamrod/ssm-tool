@@ -52,7 +52,7 @@ class SsmCleanerStack(Stack):
             "ssm_cleaner_lambda",
             code=lambda_.Code.from_asset("lambdas/ssm-parameter-cleaner"),
             runtime=lambda_.Runtime.PYTHON_3_9,
-            handler="ssm_parameter.lambda_handler",
+            handler="ssm_parameter_cleaner.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),
             layers=[ssm_cleaner_layer],
