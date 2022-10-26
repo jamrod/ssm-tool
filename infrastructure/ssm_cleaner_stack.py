@@ -4,12 +4,13 @@ from aws_cdk import (
     App,
     Stack,
     Duration,
+    RemovalPolicy,
     aws_iam as iam,
     aws_lambda as lambda_,
-    aws_ssm,
     aws_stepfunctions as step_functions,
     aws_stepfunctions_tasks as sf_tasks,
 )
+from aws_cdk.aws_lambda_python_alpha import PythonLayerVersion
 
 
 class SsmCleanerStack(Stack):
@@ -20,12 +21,14 @@ class SsmCleanerStack(Stack):
         self.stage_params = stage_params
         self.env = env
 
-        # Get layer
-        ami_bakery_layer_arn = aws_ssm.StringParameter.value_for_string_parameter(
-            self, "ami_bakery_shared_layer"
-        )
-        ami_bakery_layer = lambda_.LayerVersion.from_layer_version_arn(
-            self, "ami_bakery_layer", ami_bakery_layer_arn
+        # Create layer
+        ssm_cleaner_layer = PythonLayerVersion(
+            self,
+            "ssm_cleaner_layer",
+            entry="layers/utilities",
+            description="Shared utilities",
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            removal_policy=RemovalPolicy.RETAIN,
         )
 
         # iam role
@@ -47,12 +50,12 @@ class SsmCleanerStack(Stack):
         ssmcleaner_lambda = lambda_.Function(
             self,
             "ssm_cleaner_lambda",
-            code=lambda_.Code.from_asset("lambdas/ssm_parameter_cleaner"),
+            code=lambda_.Code.from_asset("lambdas/ssm-parameter-cleaner"),
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="ssm_parameter.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),
-            layers=[ami_bakery_layer],
+            layers=[ssm_cleaner_layer],
             role=ssmcleaner_stack_role,
             memory_size=512,
         )

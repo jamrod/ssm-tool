@@ -9,7 +9,11 @@ if [ -z $1 ] || [ ${1^} == 'Dev' ]
       role=govinator
   else
     echo invalid argument $1 try dev or prod
+fi
 
+if [[ $? -gt 0 ]]; then
+  exit 1
+fi
 echo running synth on SsmCleanerStack-${stage} ...
 cdk synth SsmCleanerStack-${stage}
 
