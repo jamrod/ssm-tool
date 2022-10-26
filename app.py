@@ -1,28 +1,16 @@
-#!/usr/bin/env python3
-import os
+"""Entrypoint for cdk ssm_cleaner stack"""
+from aws_cdk import App, Environment
 
-import aws_cdk as cdk
+from infrastructure.ssm_cleaner_stack import SsmCleanerStack
+from stage_parameters import parameters
 
-from ssm_cleaner.ssm_cleaner_stack import SsmCleanerStack
+app = App()
+
+dev = Environment(account="119377359737", region="us-east-1")
+prod = Environment(account="056952386373", region="us-east-1")
 
 
-app = cdk.App()
-SsmCleanerStack(app, "SsmCleanerStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
-
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
-
-    #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
-
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
-
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
-
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+SsmCleanerStack(app, "SsmCleanerStack-Dev", env=dev, stage_params=parameters.get("dev"))
+SsmCleanerStack(app, "SsmCleanerStack-Prod", env=dev, stage_params=parameters.get("prod"))
 
 app.synth()
