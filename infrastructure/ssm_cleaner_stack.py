@@ -50,7 +50,7 @@ class SsmCleanerStack(Stack):
         ssmcleaner_lambda = lambda_.Function(
             self,
             "ssm_cleaner_lambda",
-            code=lambda_.Code.from_asset("lambdas/ssm-parameter-cleaner"),
+            code=lambda_.Code.from_asset("lambdas/ssm_parameter_cleaner"),
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="ssm_parameter_cleaner.lambda_handler",
             environment=self.stage_params,
@@ -95,6 +95,5 @@ class SsmCleanerStack(Stack):
         state_machine_publish = step_functions.StateMachine(
             self,
             "state_machine",
-            definition=step_functions.Chain.start(init_step)
-            .next(fix_map)
+            definition=step_functions.Chain.start(init_step).next(fix_map),
         )

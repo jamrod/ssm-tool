@@ -130,7 +130,9 @@ class SSMCleaner:
                 del_res = ssm_util.delete_paramters_(names=delete_list)
                 if del_res["invalid"]:
                     for invalid_param in del_res["invalid"]:
-                        results["not_deleted"].append(f"{region}-{account}-{invalid_param}")
+                        results["not_deleted"].append(
+                            f"{region}-{account}-{invalid_param}"
+                        )
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Error in fix_duplicates for {region}-{account}"
             raise Exception(msg) from ex
@@ -220,7 +222,9 @@ def main(app, event: Dict[str, str]):
                 )
     except Exception as ex:  # pylint: disable=broad-except
         info = f"{event.get('action')}"
-        msg = f"Exception caught in fix_ssm {info} \ntype: {ex.__class__.__name__} : {ex}"
+        msg = (
+            f"Exception caught in fix_ssm {info} \ntype: {ex.__class__.__name__} : {ex}"
+        )
         LOGGER.error(msg)
         app.post_error(err=msg)
         raise Exception(msg) from ex

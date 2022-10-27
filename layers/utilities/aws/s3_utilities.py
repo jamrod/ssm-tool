@@ -6,11 +6,12 @@ from boto3_type_annotations.s3 import client as s3Client  # type: ignore
 from log_it import get_logger, log_it
 
 
-LOGGER = get_logger(os.path.basename(__file__), os.environ.get('LOG_LEVEL', 'info'))
+LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "info"))
 
 
-class S3Utilities():
+class S3Utilities:
     """Methods for interacting with Boto3 aws s3 client"""
+
     def __init__(self, client: s3Client) -> None:
         """Initialize an S3Utilities object"""
         self.client = client
@@ -33,11 +34,8 @@ class S3Utilities():
         """
         output = ""
         try:
-            res = self.client.get_object(
-                Bucket=bucket,
-                Key=key
-            )
-            output = res['Body'].read().decode('utf-8')
+            res = self.client.get_object(Bucket=bucket, Key=key)
+            output = res["Body"].read().decode("utf-8")
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in get_object_as_string\n{ex}"
             LOGGER.error(msg)
@@ -45,7 +43,7 @@ class S3Utilities():
         return output
 
     @log_it
-    def list_bucket_keys(self, bucket: str, prefix: str = '') -> list:
+    def list_bucket_keys(self, bucket: str, prefix: str = "") -> list:
         """Return a list of keys contained in bucket
 
         Parameters
@@ -60,7 +58,7 @@ class S3Utilities():
         list
             list of keys as dicts {'Key': key}
         """
-        paginator = self.client.get_paginator('list_objects_v2')
+        paginator = self.client.get_paginator("list_objects_v2")
         output = []
         try:
             res = paginator.paginate(
@@ -68,8 +66,8 @@ class S3Utilities():
                 Prefix=prefix,
             )
             for page in res:
-                if 'Contents' in page.keys():
-                    output.extend([{'Key': item['Key']} for item in page['Contents']])
+                if "Contents" in page.keys():
+                    output.extend([{"Key": item["Key"]} for item in page["Contents"]])
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in list_bucket_keys on {bucket}/{prefix} \n{ex}"
             LOGGER.error(msg)
@@ -90,14 +88,11 @@ class S3Utilities():
         """
         limit = 1000
         if keys:
-            chunked_keys = [keys[i: i + limit] for i in range(0, len(keys), limit)]
+            chunked_keys = [keys[i : i + limit] for i in range(0, len(keys), limit)]
             try:
                 for keys_chunk in chunked_keys:
                     self.client.delete_objects(
-                        Bucket=bucket,
-                        Delete={
-                            'Objects': keys_chunk
-                        }
+                        Bucket=bucket, Delete={"Objects": keys_chunk}
                     )
             except Exception as ex:  # pylint: disable=broad-except
                 msg = f"Exception occured in delete_objects_\n{ex}"
@@ -120,13 +115,9 @@ class S3Utilities():
             S3 key to save data to
 
         """
-        body = bytes(data.encode('UTF-8'))
+        body = bytes(data.encode("UTF-8"))
         try:
-            self.client.put_object(
-                Bucket=bucket,
-                Key=key,
-                Body=body
-            )
+            self.client.put_object(Bucket=bucket, Key=key, Body=body)
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in put_object\n{ex}"
             LOGGER.error(msg)
@@ -150,11 +141,8 @@ class S3Utilities():
         """
         output = {}
         try:
-            res = self.client.get_object(
-                Bucket=bucket,
-                Key=key
-            )
-            data = res['Body'].read().decode('utf-8')
+            res = self.client.get_object(Bucket=bucket, Key=key)
+            data = res["Body"].read().decode("utf-8")
             output = json.loads(data)
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in get_object_as_dict\n{ex}"
@@ -180,11 +168,8 @@ class S3Utilities():
         """
         output = {}
         try:
-            res = self.client.get_object(
-                Bucket=bucket,
-                Key=key
-            )
-            data = res['Body'].read().decode('utf-8')
+            res = self.client.get_object(Bucket=bucket, Key=key)
+            data = res["Body"].read().decode("utf-8")
             output = yaml.load(data, Loader=yaml.FullLoader)
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in get_yaml_object_as_dict\n{ex}"
@@ -198,5 +183,5 @@ def main():
     print(__doc__)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

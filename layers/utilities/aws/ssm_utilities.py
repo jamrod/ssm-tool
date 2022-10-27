@@ -134,7 +134,7 @@ class SsmUtilities:
         limit = 10
         chunks = []
         for i in range(0, len(names), limit):
-            chunks.append(names[i: i + limit])
+            chunks.append(names[i : i + limit])
         for chunk in chunks:
             try:
                 res = self.client.get_parameters(
@@ -159,7 +159,7 @@ class SsmUtilities:
         limit = 10
         chunks = []
         for i in range(0, len(names), limit):
-            chunks.append(names[i: i + limit])
+            chunks.append(names[i : i + limit])
         for chunk in chunks:
             try:
                 res = self.client.delete_parameters(

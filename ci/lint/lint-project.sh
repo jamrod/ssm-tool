@@ -1,8 +1,13 @@
 #!/bin/bash
 # Lint python files in the entire projects, see .pylintrc and setup.cfg for configuration
+# set -x
 out_file=ci/lint/output/lint-output.txt
 echo Linting run $(date) > $out_file
 files=$(find . -name \*.py -not -path "__pycache__" -not -path "*/cdk.out/*" -not -path "*/scratch/*")
+echo running black...
+skip=./layers/utilities/aws/boto3_utilities.py
+black ${files[@]/$skip}
+echo 'done!'
 printf "\npycodestyle output ------------------------------------\n" >> $out_file
 pycodestyle $files >> $out_file
 prgm1=$?
