@@ -102,34 +102,38 @@ class SSMCleaner:
         """
         results = {"not_updated": [], "not_deleted": []}
         param_names_upper = []
-        for dist_name in DISTROS:
-            param_names_upper.append(f"pcm-{dist_name}-{STAGE}-latest")
-        delete_list = []
-        ssm_util = SsmUtilities(
-            Boto3Utilities().get_boto3_client(
-                account=account, client_type="ssm", role_name=ROLE, region=region
+        try:
+            for dist_name in DISTROS:
+                param_names_upper.append(f"pcm-{dist_name}-{STAGE}-latest")
+            delete_list = []
+            ssm_util = SsmUtilities(
+                Boto3Utilities().get_boto3_client(
+                    account=account, client_type="ssm", role_name=ROLE, region=region
+                )
             )
-        )
-        param_res = ssm_util.get_parameters_(names=param_names_upper)
-        for param in param_res:
-            lower_param = param["Name"].lower()
-            if ssm_util.check_parameter(name=lower_param):
-                updated = ssm_util.put_parameter_(
-                    name=lower_param, value=f"{param['Value']}"
-                )
-            else:
-                updated = ssm_util.put_parameter_with_tags(
-                    name=lower_param, value=f"{param['Value']}", tags=TAGS
-                )
-            if updated:
-                delete_list.append(param["Name"])
-            else:
-                results["not_updated"].append(f"{region}-{account}-{param['Name']}")
-        if delete_list:
-            del_res = ssm_util.delete_paramters_(names=delete_list)
-            if del_res["invalid"]:
-                for invalid_param in del_res["invalid"]:
-                    results["not_deleted"].append(f"{region}-{account}-{invalid_param}")
+            param_res = ssm_util.get_parameters_(names=param_names_upper)
+            for param in param_res:
+                lower_param = param["Name"].lower()
+                if ssm_util.check_parameter(name=lower_param):
+                    updated = ssm_util.put_parameter_(
+                        name=lower_param, value=f"{param['Value']}"
+                    )
+                else:
+                    updated = ssm_util.put_parameter_with_tags(
+                        name=lower_param, value=f"{param['Value']}", tags=TAGS
+                    )
+                if updated:
+                    delete_list.append(param["Name"])
+                else:
+                    results["not_updated"].append(f"{region}-{account}-{param['Name']}")
+            if delete_list:
+                del_res = ssm_util.delete_paramters_(names=delete_list)
+                if del_res["invalid"]:
+                    for invalid_param in del_res["invalid"]:
+                        results["not_deleted"].append(f"{region}-{account}-{invalid_param}")
+        except Exception as ex:  # pylint: disable=broad-except
+            msg = f"Error in fix_duplicates for {region}-{account}"
+            raise Exception(msg) from ex
         return results
 
     @log_it
@@ -212,13 +216,11 @@ def main(app, event: Dict[str, str]):
                     region=job.get("region"), account=job.get("account")
                 )
                 LOGGER.info(
-                    msg=f"Results for {event['region']} {event['account']}: {res}"
+                    msg=f"Results for {job.get('region')} {job.get('account')}: {res}"
                 )
     except Exception as ex:  # pylint: disable=broad-except
-        info = f"for {event['region']}"
-        if event["action"] == "fix":
-            info += f"-{event['account']}"
-        msg = f"Exception caught in fix_ssm \ntype: {ex.__class__.__name__} : {ex}"
+        info = f"{event.get('action')}"
+        msg = f"Exception caught in fix_ssm {info} \ntype: {ex.__class__.__name__} : {ex}"
         LOGGER.error(msg)
         app.post_error(err=msg)
         raise Exception(msg) from ex
