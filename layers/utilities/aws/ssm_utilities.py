@@ -148,8 +148,8 @@ class SsmUtilities:
         return output
 
     @log_it
-    def delete_paramters_(self, names=List[str]) -> dict:
-        """calls delete_parameters TODO: Fix spelling error in function name
+    def delete_parameters_(self, names=List[str]) -> dict:
+        """calls delete_parameters
         Parameters
         ----------
         names : List[str]

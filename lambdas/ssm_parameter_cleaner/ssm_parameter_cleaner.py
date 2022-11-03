@@ -127,14 +127,14 @@ class SSMCleaner:
                 else:
                     results["not_updated"].append(f"{region}-{account}-{param['Name']}")
             if delete_list:
-                del_res = ssm_util.delete_paramters_(names=delete_list)
+                del_res = ssm_util.delete_parameters_(names=delete_list)
                 if del_res["invalid"]:
                     for invalid_param in del_res["invalid"]:
                         results["not_deleted"].append(
                             f"{region}-{account}-{invalid_param}"
                         )
         except Exception as ex:  # pylint: disable=broad-except
-            msg = f"Error in fix_duplicates for {region}-{account}"
+            msg = f"Error in fix_duplicates for {region}-{account}\ntype: {ex.__class__.__name__} : {ex}"
             raise Exception(msg) from ex
         return results
 
