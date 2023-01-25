@@ -58,6 +58,7 @@ class SsmCleanerStack(Stack):
             layers=[ssm_cleaner_layer],
             role=ssmcleaner_stack_role,
             memory_size=512,
+            function_name="pcm_ssm_tool"
         )
 
         # step function tasks
@@ -69,31 +70,50 @@ class SsmCleanerStack(Stack):
         ).add_retry(
             errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
         )
-        fix_step = sf_tasks.LambdaInvoke(
+        divide_jobs_step = sf_tasks.LambdaInvoke(
             self,
-            "fix",
+            "divide_jobs",
+            lambda_function=ssmcleaner_lambda,
+            payload_response_only=True,
+        ).add_retry(
+            errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
+        )
+        run_job_step = sf_tasks.LambdaInvoke(
+            self,
+            "run_job",
             lambda_function=ssmcleaner_lambda,
             payload_response_only=True,
         ).add_retry(
             errors=["States.TaskFailed"], max_attempts=1, interval=Duration.seconds(60)
         )
-        # map steps
-        fix_map = (
-            step_functions.Map(
-                self,
-                "fix_map",
-            )
-            .iterator(fix_step)
-            .add_retry(
-                errors=["States.TaskFailed"],
-                max_attempts=1,
-                interval=Duration.seconds(60),
-            )
+        error_check_step = sf_tasks.LambdaInvoke(
+            self,
+            "error_check_step",
+            lambda_function=ssmcleaner_lambda,
+            payload=step_functions.TaskInput.from_object({"action": "error_check"}),
+        ).add_retry(
+            errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
         )
 
+        # map steps
+        divide_jobs_map = step_functions.Map(
+            self,
+            "divide_jobs_map",
+        ).iterator(divide_jobs_step)
+        run_jobs_map = step_functions.Map(
+            self,
+            "run_jobs_map",
+        ).iterator(run_job_step)
+        handle_jobs_map = step_functions.Map(
+            self, "handle_jobs_map", output_path="$[0]"
+        ).iterator(run_jobs_map)
+
         # state_machine
-        state_machine_publish = step_functions.StateMachine(
+        state_machine_ssmcleaner = step_functions.StateMachine(
             self,
             "state_machine",
-            definition=step_functions.Chain.start(init_step).next(fix_map),
+            definition=step_functions.Chain.start(init_step)
+            .next(divide_jobs_map)
+            .next(handle_jobs_map)
+            .next(error_check_step),
         )

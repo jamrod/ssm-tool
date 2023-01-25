@@ -1,18 +1,21 @@
-Linting run Thu Oct 27 09:39:17 MDT 2022
+Linting run Tue Jan 24 15:55:47 MST 2023
 
 pycodestyle output ------------------------------------
 ./layers/utilities/aws/s3_utilities.py:91:35: E203 whitespace before ':'
-./layers/utilities/aws/ssm_utilities.py:137:34: E203 whitespace before ':'
-./layers/utilities/aws/ssm_utilities.py:162:34: E203 whitespace before ':'
+./layers/utilities/aws/ssm_utilities.py:164:34: E203 whitespace before ':'
+./layers/utilities/aws/ssm_utilities.py:209:34: E203 whitespace before ':'
 
 pylint output -----------------------------------------
+************* Module lambdas.ssm_parameter_cleaner.ssm_parameter_cleaner
+lambdas/ssm_parameter_cleaner/ssm_parameter_cleaner.py:327:4: C0103: Constant name "output" doesn't conform to UPPER_CASE naming style (invalid-name)
+lambdas/ssm_parameter_cleaner/ssm_parameter_cleaner.py:327:13: E1120: No value for argument 'self' in unbound method call (no-value-for-parameter)
 ************* Module boto3_utilities
 layers/utilities/aws/boto3_utilities.py:245:4: R0913: Too many arguments (6/5) (too-many-arguments)
 layers/utilities/aws/boto3_utilities.py:304:4: R0913: Too many arguments (6/5) (too-many-arguments)
 layers/utilities/aws/boto3_utilities.py:363:4: R0913: Too many arguments (8/5) (too-many-arguments)
 
 ------------------------------------------------------------------
-Your code has been rated at 9.94/10 (previous run: 9.90/10, +0.04)
+Your code has been rated at 9.84/10 (previous run: 9.84/10, +0.00)
 
 files checked -----------------------------------------
 ./lambdas/ssm_parameter_cleaner/__init__.py

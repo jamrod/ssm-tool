@@ -86,6 +86,33 @@ class SsmUtilities:
             raise Exception(msg) from ex
 
     @log_it
+    def update_tags_on_parameter(self, name: str, tags: List[dict]) -> bool:
+        """Updates tags on a parameter
+
+        Parameters
+        ----------
+        name : str
+            The name of the parameter
+        tags : List[dict]
+            List of tags as dicts
+        """
+        try:
+            self.client.remove_tags_from_resource(
+                ResourceType="Parameter",
+                ResourceId=name,
+                TagKeys=[item["Key"] for item in tags],
+            )
+            self.client.add_tags_to_resource(
+                ResourceType="Parameter", ResourceId=name, Tags=tags
+            )
+            LOGGER.info(f"Tags updated for {name}")
+            return True
+        except Exception as ex:  # pylint: disable=broad-except
+            msg = f"Error caught in add_tags_to_parameter\n{ex.__class__.__name__}: {str(ex)}"
+            LOGGER.error(msg)
+            raise Exception(msg) from ex
+
+    @log_it
     def send_install_command(self, instance_id: str) -> dict:
         """Send command to install amazon inspector agent"""
         try:
@@ -146,6 +173,26 @@ class SsmUtilities:
                 LOGGER.error(msg)
                 raise Exception(msg) from ex
         return output
+
+    @log_it
+    def describe_parameters_(self, filters: List[dict]) -> dict:
+        """calls describe_parameters,
+        Parameters
+        ----------
+        filters : List[dict]
+            The filter to use to reduce results
+        """
+        try:
+            paginator = self.client.get_paginator("describe_parameters")
+            res = paginator.paginate(ParameterFilters=filters)
+            parameters = []
+            for page in res:
+                parameters.extend(page["Parameters"])
+            return parameters
+        except Exception as ex:  # pylint: disable=broad-except
+            msg = f"Error caught in describe_parameters\n{ex.__class__.__name__}: {str(ex)}"
+            LOGGER.error(msg)
+            raise Exception(msg) from ex
 
     @log_it
     def delete_parameters_(self, names=List[str]) -> dict:
