@@ -1,0 +1,9 @@
+{
+    "action": "init",
+    "job_action": "create",
+    "args": {
+        "names_values": {
+            "test_param": "very-important-string"
+        }
+    }
+}

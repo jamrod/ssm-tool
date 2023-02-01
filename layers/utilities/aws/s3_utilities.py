@@ -88,7 +88,7 @@ class S3Utilities:
         """
         limit = 1000
         if keys:
-            chunked_keys = [keys[i : i + limit] for i in range(0, len(keys), limit)]
+            chunked_keys = [keys[i: i + limit] for i in range(0, len(keys), limit)]
             try:
                 for keys_chunk in chunked_keys:
                     self.client.delete_objects(

@@ -1,0 +1,8 @@
+{
+  "ssm_parameter_tool": {
+    "ROLE": "PCMCloudAdmin",
+    "S3_BUCKET": "pcm-shared-code-530786275774",
+    "T_ENV_TAG": "DEV",
+    "STAGE": "dev"
+  }
+}
