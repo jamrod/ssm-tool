@@ -1,0 +1,22 @@
+{
+    "environment": {
+        "dev": {"account": "530786275774", "region": "us-east-1"},
+        "prod": {"account": "747207162522", "region": "us-east-1"}
+    },
+    "ssm_parameter_tool": {
+        "prod": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-747207162522",
+            "T_ENV_TAG": "PRD",
+            "STAGE": "prod",
+            "S3_ACCOUNT": "747207162522"
+        },
+        "dev": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-530786275774",
+            "T_ENV_TAG": "DEV",
+            "STAGE": "dev",
+            "S3_ACCOUNT": "530786275774"
+        }
+    }
+}

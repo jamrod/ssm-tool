@@ -88,6 +88,7 @@ class SsmUtilities:
     @log_it
     def update_tags_on_parameter(self, name: str, tags: List[dict]) -> bool:
         """Updates tags on a parameter
+        deletes tags first and replaces with new otherwise existing tag will not change value
 
         Parameters
         ----------
@@ -161,7 +162,7 @@ class SsmUtilities:
         limit = 10
         chunks = []
         for i in range(0, len(names), limit):
-            chunks.append(names[i : i + limit])
+            chunks.append(names[i: i + limit])
         for chunk in chunks:
             try:
                 res = self.client.get_parameters(
@@ -202,11 +203,14 @@ class SsmUtilities:
         names : List[str]
             The name of the parameter
         """
-        output = {"deleted": [], "invalid": []}
+        output = {
+            "deleted": [],
+            "invalid": []
+        }
         limit = 10
         chunks = []
         for i in range(0, len(names), limit):
-            chunks.append(names[i : i + limit])
+            chunks.append(names[i: i + limit])
         for chunk in chunks:
             try:
                 res = self.client.delete_parameters(
@@ -215,12 +219,50 @@ class SsmUtilities:
                 if res["DeletedParameters"]:
                     output["deleted"].extend(res["DeletedParameters"])
                 if res["InvalidParameters"]:
-                    output["invalid"].extend(res["DeletedParameters"])
+                    output["invalid"].extend(res["InvalidParameters"])
             except Exception as ex:  # pylint: disable=broad-except
                 msg = f"Error caught in delete_parameters\n{ex.__class__.__name__}: {str(ex)}"
                 LOGGER.error(msg)
                 raise Exception(msg) from ex
         return output
+
+    @log_it
+    def list_tags_for_resource_(self, resource_type: str, resource_id: str) -> List[dict]:
+        """Returns tags for the given resource
+
+        Parameters
+        ----------
+        resource_type : str
+            The type of resource ie "Parameter"
+
+        resource_id : str
+            Identifier for the resource ie parameter name
+
+        Returns
+        -------
+        List[dict]
+            [
+                {
+                    "Key": "t_environment",
+                    "Value": "PRD"
+                },
+                {
+                    "Key": "t_dcl",
+                    "Value": "1"
+                },
+                {
+                    "Key": "t_AppID",
+                    "Value": "SVC02522"
+                }
+            ]
+        """
+        try:
+            res = self.client.list_tags_for_resource(ResourceType=resource_type, ResourceId=resource_id)
+            return res["TagList"]
+        except Exception as ex:  # pylint: disable=broad-except
+            msg = f"Error caught in list_tags_for_resource\n{ex.__class__.__name__}: {str(ex)}"
+            LOGGER.error(msg)
+            raise Exception(msg) from ex
 
     def __repr__(self):
         """return a string representation of this object"""

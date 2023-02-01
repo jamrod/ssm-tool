@@ -1,0 +1,9 @@
+{
+    "action": "init",
+    "job_action": "remove",
+    "args": {
+        "names": [
+            "test_param"
+        ]
+    }
+}

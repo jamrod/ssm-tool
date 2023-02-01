@@ -1,11 +1,11 @@
 #!/bin/bash
-if [ -z $1 ] || [ ${1^} == 'Dev' ]
+if [ -z $1 ] || [ ${1} == 'dev' ]
     then
-      stage=Dev
+      stage=dev
       role=devinator
-  elif [ ${1^} == 'Prod' ]
+  elif [ ${1} == 'prod' ]
     then
-      stage=Prod
+      stage=${1}
       role=govinator
   else
     echo invalid argument $1 try dev or prod
@@ -14,8 +14,6 @@ fi
 if [[ $? -gt 0 ]]; then
   exit 1
 fi
-echo running synth on SsmCleanerStack-${stage} ...
-cdk synth SsmCleanerStack-${stage}
 
-echo deploying stack SsmCleanerStack-${stage} ...
-aws-runas $role cdk deploy --app 'cdk.out/' SsmCleanerStack-${stage} -t t_AppID=SVC02522
+echo deploying stack SsmParameterToolStack-${stage^} ...
+aws-runas $role cdk deploy --app 'cdk.out/' SsmParameterToolStack-${stage^} -t t_AppID=SVC02522 --require-approval never

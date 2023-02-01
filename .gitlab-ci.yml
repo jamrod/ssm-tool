@@ -1,0 +1,80 @@
+variables:
+  ENVIRONMENT: dev
+  ROLE_ARN: arn:aws:iam::747207162522:role/PCMCloudAdmin
+  DEV_ARN: arn:aws:iam::530786275774:role/PCMCloudAdmin
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375/
+
+stages:
+  - lint
+  - cdk
+
+.assume_role_script_template: &assume_role_script
+ before_script:
+ - eval "$(aws sts assume-role --role-arn ${ROLE_ARN} --duration-seconds 3600 --role-session-name "CI-${CI_COMMIT_SHA}" | jq -r '.Credentials|@sh "aws_secret=\(.SecretAccessKey) aws_session=\(.SessionToken) expiration=\(.Expiration) aws_key=\(.AccessKeyId)"')"
+ - export AWS_ACCESS_KEY_ID=${aws_key}
+ - export AWS_SECRET_ACCESS_KEY=${aws_secret}
+ - export AWS_SESSION_TOKEN=${aws_session} >/dev/null
+
+
+##############################################################################
+# Lint
+##############################################################################
+
+lint:
+  stage: lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "main"'
+      changes:
+        - infrastructure/*
+        - lambdas/*/*
+        - layers/*/*
+        - app.py
+        - parameter_store.json
+      when: always
+  script:
+    - bash ci/lint/lint-project.sh
+  tags:
+    - ami-builder-dev
+  artifacts:
+    paths:
+      - ci/lint/output/lint-output.txt
+  allow_failure: false
+
+
+##############################################################################
+# CDK
+##############################################################################
+
+deploy-ssm-paramter-tool:
+  stage: cdk
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - infrastructure/ssm_parameter_tool_stack
+        - lambdas/ssm_parameter_tool/*
+        - layers/*
+        - app.py
+        - parameter_store.json
+      when: on_success
+      variables:
+        ROLE_ARN: $DEV_ARN
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - infrastructure/ssm_parameter_tool_stack
+        - lambdas/ssm_parameter_tool/*
+        - layers/*
+        - app.py
+        - parameter_store.json
+      when: on_success
+      variables:
+        ENVIRONMENT: prod
+  services:
+    - docker:18-dind
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - echo running synth on SsmParameterToolStack-${ENVIRONMENT^} ...
+    - cdk synth SsmParameterToolStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
+    - cdk deploy --app 'cdk.out/' SsmParameterToolStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
