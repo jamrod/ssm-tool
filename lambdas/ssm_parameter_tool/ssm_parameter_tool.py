@@ -127,7 +127,7 @@ class SsmParameterTool:
     def create_update_parameters(
         self, ssm_util: SsmUtilities, names_values: Dict[str, str], tags: List[dict]
     ) -> bool:
-        """Add one or more new ssm parameters
+        """Add or update one or more new ssm parameters
 
         Parameters
         ----------
