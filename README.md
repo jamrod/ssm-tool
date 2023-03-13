@@ -18,10 +18,12 @@ The SSM Parameter tool is a State Machine on AWS which accepts an event as JSON 
  - Then the State Machine will concurrently fetch batches of jobs from s3 and execute the jobs
  - The execution ends with a final error check to determine if there were any failures across any account/region
 
+### How To
+To run a job, copy one of the sample event JSON files from 'ci/test/events' to 'jobs/' and edit to suit your needs. Then git add/commit and push. The 'run-job' script will automatically execute any .json files in the 'jobs/' folder and display the results in gitlab.
+Alternately, you can trigger the execution locally in a Linux or Mac environment by running the 'scripts/run-job.sh' script with 'govinator' role.
+
 #### Current options
 Currently there are jobs defined for "create", "update", "delete", "rename" or "fix_tags".
-
-Use sample JSON events in ci/test/events as a starting point then modify and pass to state machine to make use of the tool.
 
 
 Update event:
@@ -43,4 +45,4 @@ Update event:
 }
 ```
 
-Optionally, a different account list may be provided by uploading to the pcm-shared-code-530786275774 (or 747207162522 for prod) s3 bucket and then passing the s3 key to the event as "accounts_key".
+Optionally, a different account list may be provided by uploading to the pcm-shared-code-747207162522 (or 530786275774 for dev) s3 bucket and then passing the s3 key to the event as "accounts_key".

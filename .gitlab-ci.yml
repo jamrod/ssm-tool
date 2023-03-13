@@ -8,6 +8,7 @@ variables:
 stages:
   - lint
   - cdk
+  - run-jobs
 
 .assume_role_script_template: &assume_role_script
  before_script:
@@ -78,3 +79,21 @@ deploy-ssm-paramter-tool:
     - echo running synth on SsmParameterToolStack-${ENVIRONMENT^} ...
     - cdk synth SsmParameterToolStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
     - cdk deploy --app 'cdk.out/' SsmParameterToolStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
+
+
+###############################################################################
+# Run-Jobs
+###############################################################################
+run-jobs:
+  stage: run-jobs
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - jobs/*.json
+      variables:
+        ROLE_ARN: $DEV_ARN
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - bash scripts/run-job.sh
