@@ -1,0 +1,24 @@
+To run a job, copy one of the sample events from 'ci/test/events' to 'jobs/'
+and edit to suit your needs. Then git add/commit and push.
+The 'run-job' script will automatically execute any .json files in the 'jobs/' folder
+and display the results in gitlab.
+Alternately, you can trigger the execution locally in a Linux or Mac environment
+by running the 'scripts/run-job.sh' script with 'govinator' role
+
+Sample 'update' job:
+
+{
+    "action": "init",
+    "job_action": "update",
+    "args": {
+        "names_values": {
+            "name_of_parameter": "new value"
+        },
+        "tags": [
+            {"Key": "t_environment", "Value": "DEV"},
+            {"Key": "t_AppID", "Value": "SVC02522"},
+            {"Key": "t_dcl", "Value": "1"},
+            {"Key": "test_tag", "Value": "test"}
+        ]
+    }
+}
