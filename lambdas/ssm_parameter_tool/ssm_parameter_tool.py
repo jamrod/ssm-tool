@@ -192,7 +192,7 @@ class SsmParameterTool:
                 del_res = ssm_util.delete_parameters_(names=delete_list)
                 if del_res["invalid"]:
                     msg = f"These parameters did not delete for reason 'invalid': {str(del_res['invalid'])}"
-                    raise Exception(msg)
+                    LOGGER.error(msg)
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Error in rename_parameters \ntype: {ex.__class__.__name__} : {ex}"
             raise SsmToolException(msg) from ex
@@ -260,7 +260,7 @@ class SsmParameterTool:
             del_res = ssm_util.delete_parameters_(names=names)
             if del_res["invalid"]:
                 msg = f"These parameters did not delete for reason 'invalid': {str(del_res['invalid'])}"
-                raise Exception(msg)
+                LOGGER.info(msg)
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Error in delete_parameters \ntype: {ex.__class__.__name__} : {ex}"
             raise SsmToolException(msg) from ex

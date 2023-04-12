@@ -1,0 +1,9 @@
+{
+    "action": "init",
+    "job_action": "remove",
+    "args": {
+        "names": [
+            "pcs-amzn-dev-latest"
+        ]
+    }
+}
