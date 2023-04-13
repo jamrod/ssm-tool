@@ -1,0 +1,16 @@
+{
+    "action": "init",
+    "job_action": "remove",
+    "args": {
+        "names": [
+            "pcs-amzn-dev-latest",
+            "pcs-amzn-prod-latest",
+            "pcs-amzn2arm-dev-latest",
+            "pcs-amzn2arm-prod-latest",
+            "pcs-amzn2armecs-dev-latest",
+            "pcs-amzn2armecs-prod-latest",
+            "pcs-amzn2ecs-prod-latest",
+            "pcs-amzn2ecs-dev-latest"
+        ]
+    }
+}

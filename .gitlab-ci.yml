@@ -90,8 +90,6 @@ run-jobs:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       changes:
         - jobs/*.json
-      variables:
-        ROLE_ARN: $DEV_ARN
   tags:
     - pcm-prod
   <<: *assume_role_script
