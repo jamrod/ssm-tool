@@ -3,7 +3,8 @@
     "job_action": "remove",
     "args": {
         "names": [
-            "pcs-amzn-dev-latest"
+            "pcs-amzn-dev-latest",
+            "pcs-amzn2ecs-dev-latest"
         ]
     }
 }

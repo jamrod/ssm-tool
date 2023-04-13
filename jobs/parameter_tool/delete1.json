@@ -1,9 +1,0 @@
-{
-    "action": "init",
-    "job_action": "remove",
-    "args": {
-        "names": [
-            "pcs-amzn2armecs-dev-latest"
-        ]
-    }
-}
