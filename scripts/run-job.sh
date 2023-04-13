@@ -5,8 +5,7 @@ declare -i maxPoll=10 # max number of times to poll before exiting
 declare -i exit_code=0
 
 # get aws account shell is in, strip Account from sts call, xargs removes quotes
-account=$(aws-runas devinator aws sts get-caller-identity | jq .Account | xargs)
-
+account=$(aws sts get-caller-identity | jq .Account | xargs)
 for job in jobs/parameter_tool/*.json; do
     printf "running job ${job}\n waiting...\n"
     # outfile=$(f=${job#jobs/}; echo outputs/${f%.json}-result.json) # declare output file by stripping 'jobs/' from the front and swapping '.json' for '-result.json' at the end

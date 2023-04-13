@@ -37,7 +37,7 @@ class S3Utilities:
             res = self.client.get_object(Bucket=bucket, Key=key)
             output = res["Body"].read().decode("utf-8")
         except Exception as ex:  # pylint: disable=broad-except
-            msg = f"Exception occured in get_object_as_string\n{ex}"
+            msg = f"Exception occured in get_object_as_string {bucket}/{key} \n{ex}"
             LOGGER.error(msg)
             raise Exception(msg) from ex
         return output
@@ -95,7 +95,7 @@ class S3Utilities:
                         Bucket=bucket, Delete={"Objects": keys_chunk}
                     )
             except Exception as ex:  # pylint: disable=broad-except
-                msg = f"Exception occured in delete_objects_\n{ex}"
+                msg = f"Exception occured in delete_objects_ in {bucket} \n{ex}"
                 LOGGER.error(msg)
                 raise Exception(msg) from ex
 
@@ -119,7 +119,7 @@ class S3Utilities:
         try:
             self.client.put_object(Bucket=bucket, Key=key, Body=body)
         except Exception as ex:  # pylint: disable=broad-except
-            msg = f"Exception occured in put_object\n{ex}"
+            msg = f"Exception occured in put_object {bucket}/{key} \n{ex}"
             LOGGER.error(msg)
             raise Exception(msg) from ex
 
@@ -145,7 +145,7 @@ class S3Utilities:
             data = res["Body"].read().decode("utf-8")
             output = json.loads(data)
         except Exception as ex:  # pylint: disable=broad-except
-            msg = f"Exception occured in get_object_as_dict\n{ex}"
+            msg = f"Exception occured in get_object_as_dict for {bucket}/{key} \n{ex}"
             LOGGER.error(msg)
             raise Exception(msg) from ex
         return output
@@ -172,7 +172,7 @@ class S3Utilities:
             data = res["Body"].read().decode("utf-8")
             output = yaml.load(data, Loader=yaml.FullLoader)
         except Exception as ex:  # pylint: disable=broad-except
-            msg = f"Exception occured in get_yaml_object_as_dict\n{ex}"
+            msg = f"Exception occured in get_yaml_object_as_dict {bucket}/{key} \n{ex}"
             LOGGER.error(msg)
             raise Exception(msg) from ex
         return output
