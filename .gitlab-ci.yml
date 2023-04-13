@@ -89,7 +89,7 @@ run-jobs:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       changes:
-        - jobs/*.json
+        - jobs/*/*.json
   tags:
     - pcm-prod
   <<: *assume_role_script
