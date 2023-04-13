@@ -3,11 +3,15 @@
 declare -i pollDelay=60 # delay in seconds between polling execution status
 declare -i maxPoll=10 # max number of times to poll before exiting
 declare -i exit_code=0
+
+# get aws account shell is in, strip Account from sts call, xargs removes quotes
+account=$(aws-runas devinator aws sts get-caller-identity | jq .Account | xargs)
+
 for job in jobs/parameter_tool/*.json; do
     printf "running job ${job}\n waiting...\n"
     # outfile=$(f=${job#jobs/}; echo outputs/${f%.json}-result.json) # declare output file by stripping 'jobs/' from the front and swapping '.json' for '-result.json' at the end
     exec_arn=$({
-        aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_parameter_tool_SM \
+        aws stepfunctions start-execution --state-machine-arn arn:aws:states:us-east-1:${account}:stateMachine:pcm_ssm_parameter_tool_SM \
             --input "$(jq -R . ${job} --raw-output)" \
             --output json
         }| jq .executionArn)
