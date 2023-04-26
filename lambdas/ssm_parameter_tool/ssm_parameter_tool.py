@@ -46,7 +46,7 @@ class SsmParameterTool:
         return self.s3_utils.get_object_as_dict(bucket=S3_BUCKET, key=accounts_key)
 
     @log_it
-    def make_jobs(self, action: str, args: dict, account_list: List[dict]) -> List[str]:
+    def make_jobs(self, action: str, args: dict, account_list: Dict[str, list]) -> List[str]:
         """Create jobs by chunking accounts into batches and dividing by regions
         then posting to s3
 

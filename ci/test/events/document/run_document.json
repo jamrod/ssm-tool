@@ -1,0 +1,14 @@
+{
+    "action": "init",
+    "args": {
+        "document": "CrowdStrikeFalconInstall-ubuntu",
+        "parameters": {
+            "presignedurl": [
+                "https://prsn-downloadable-restricted-artifacts-us-east-1-747207162522.s3.us-east-1.amazonaws.com/crowdstrike-installs/falcon-sensor_6.51.0-14810_amd64.deb?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIARXS3R6N4YM3J5XG5%2F20230318%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230318T195422Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEIT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDe%2B4upzYgLp4KJ4Hu3kOtd1NlzP7wX%2FXnlQvib2yugMgIhANg7%2FFVTa1DQJ1QHVamSuD0QTUhEue5MSEft5NG7Xc7HKqYCCE0QAhoMMTE5Mzc3MzU5NzM3IgyB8l6lJ3sGk%2BZVGIIqgwJurP1hCquYblWS3wP5hgDfUNTnsfbR5mkYf5aLcDAOwWpvTrpbm9dbQX4Ky3xIwGVVVZUtH60SqBvYmmo7aeX1NNkMJLRIjZKsrZLSnGINt4XdctTeg0b05fjdemKvTh5wa65z7HDd%2BCo6EmgdVmjG9Cgukm2AxKxiHEMuKNlVHY7L94xM%2Bf7njIHMapt1k6jcwx52DHTFKaofE5%2BJU7%2BR5tINna2cbxUln2VgNmVPvZghxU7H3UCpIu4zVClJ0tJPKoKa%2FgF%2BfOKdb4f7XY%2BX99uz1LF813EWBDqrU9RYCksxBYgVcih9reqxIlDUFHnFOQ%2BgSx7T4zPnkc5HKRav%2BBdKMNOq2KAGOpwBkamgo%2BACt5hwCc7XC%2FMEkCdLMX4YWrAH65Ifn5Y7rs4r6ybSNYmdd%2FobvZWl44E7rpF%2BaStxQaeRG7m3%2BBhiyPEiqvxwAN2La8tNV1P4yigKtJAhsmW5QwfoVznoHCDV1FMUu06CfNCb%2BQPfNquyCC6%2FPVHCdKLEPR3c7eMuXtScdDvpXVKRd7eFDRp33c3eH3K4BldMRjY%2BBFOh&X-Amz-Signature=7c72f048e6499d811f30ae8ddaf343538eed5e8e128fa4f5226f65c6109c93a6"
+            ],
+            "activate": [
+                "False"
+            ]
+        }
+    }
+}

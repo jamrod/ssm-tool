@@ -18,5 +18,31 @@
             "STAGE": "dev",
             "S3_ACCOUNT": "530786275774"
         }
+    },
+    "ssm_run_document_tool": {
+        "prod": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-747207162522",
+            "STAGE": "prod",
+            "S3_ACCOUNT": "747207162522"
+        },
+        "dev": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-530786275774",
+            "STAGE": "dev",
+            "S3_ACCOUNT": "530786275774"
+        }
+    },
+    "ssm_deploy_document_tool": {
+        "prod": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-747207162522",
+            "S3_ACCOUNT": "747207162522"
+        },
+        "dev": {
+            "ROLE": "PCMCloudAdmin",
+            "S3_BUCKET": "pcm-shared-code-530786275774",
+            "S3_ACCOUNT": "530786275774"
+        }
     }
 }

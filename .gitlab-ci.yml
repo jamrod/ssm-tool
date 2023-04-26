@@ -4,10 +4,12 @@ variables:
   DEV_ARN: arn:aws:iam::530786275774:role/PCMCloudAdmin
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://docker:2375/
+  SHARE_ACCOUNTS_KEY: # ssm_tool/accounts_list
 
 stages:
   - lint
   - cdk
+  - documents
   - run-jobs
 
 .assume_role_script_template: &assume_role_script
@@ -80,18 +82,110 @@ deploy-ssm-paramter-tool:
     - cdk synth SsmParameterToolStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
     - cdk deploy --app 'cdk.out/' SsmParameterToolStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
 
-
-###############################################################################
-# Run-Jobs
-###############################################################################
-run-jobs:
-  stage: run-jobs
+deploy-document-tool:
+  stage: cdk
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
       changes:
-        - jobs/*/*.json
+        - infrastructure/ssm_deploy_document_stack
+        - lambdas/ssm_deploy_document_tool/*
+        - app.py
+        - parameter_store.json
+      when: on_success
+      variables:
+        ROLE_ARN: $DEV_ARN
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - infrastructure/ssm_deploy_document_stack
+        - lambdas/ssm_deploy_document_tool/*
+        - app.py
+        - parameter_store.json
+      when: on_success
+      variables:
+        ENVIRONMENT: prod
+  services:
+    - docker:18-dind
   tags:
     - pcm-prod
   <<: *assume_role_script
   script:
-    - bash scripts/run-job.sh
+    - echo running synth on SsmDeployDocumentStack-${ENVIRONMENT^} ...
+    - cdk synth SsmDeployDocumentStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
+    - cdk deploy --app 'cdk.out/' SsmDeployDocumentStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
+
+deploy-shared-layer:
+  stage: cdk
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - layers/*
+      when: on_success
+      variables:
+        ROLE_ARN: $DEV_ARN
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - layers/*
+      when: on_success
+      variables:
+        ENVIRONMENT: prod
+  services:
+    - docker:18-dind
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - echo running synth on SsmSharedLayerStack-${ENVIRONMENT^} ...
+    - cdk synth SsmSharedLayerStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
+    - cdk deploy --app 'cdk.out/' SsmSharedLayerStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
+
+
+###############################################################################
+# Documents
+###############################################################################
+
+deploy-documents:
+  stage: documents
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - documents/*
+      when: on_success
+      variables:
+        ENVIRONMENT: prod
+    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - documents/*
+      when: on_success
+      variables:
+        ROLE_ARN: $DEV_ARN
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - bash scripts/upload_documents.sh ${ENVIRONMENT}
+    - python3.9 -m pip install -r layers/utilities/requirements.txt
+    - export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
+    - if [[ -n $SHARE_ACCOUNTS_KEY ]]; then event='{ "action"':' "init", "accounts_key"':' "'$SHARE_ACCOUNTS_KEY'" }'; else event='{ "action"':' "init" }'; fi
+    - echo $event
+    - python3.9 scripts/start_state_machine.py ${ENVIRONMENT} deploy_document ssm_tool """${event}""" --wait
+
+
+###############################################################################
+# Run-Jobs
+###############################################################################
+run-parameter-jobs:
+  stage: run-jobs
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $ENVIRONMENT == "prod"'
+      changes:
+        - jobs/parameter_tool/*.json
+    - if: '$CI_PIPELINE_SOURCE == "push" && $ENVIRONMENT == "dev"'
+      changes:
+        - jobs/parameter_tool/*.json
+      variables:
+        ROLE_ARN: $DEV_ARN
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - bash scripts/run-parameter-job.sh
