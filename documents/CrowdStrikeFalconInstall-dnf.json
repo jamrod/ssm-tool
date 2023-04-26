@@ -1,0 +1,47 @@
+{
+    "schemaVersion": "2.2",
+    "description": "Install CrowdStrike Falcon Sensor dnf",
+    "parameters": {
+        "presignedurl": {
+            "type": "String"
+        },
+        "activate": {
+            "type": "String",
+            "default": "True",
+            "allowedValues": [ "False", "True" ]
+        },
+        "cid": {
+            "type": "String",
+            "default": "50E47E6AF55B4A7C93688E7F6AA9E229-A8"
+        }
+    },
+    "mainSteps": [
+        {
+            "action": "aws:runShellScript",
+            "name": "Install",
+            "inputs": {
+                "runCommand": [
+                    "cd",
+                    "sudo curl -o installer-file.rpm \"{{ presignedurl }}\"",
+                    "sudo dnf install installer-file.rpm -y",
+                    "sudo rm installer-file.rpm",
+                    "sudo ls /opt/CrowdStrike/falcon-sensor"
+                ]
+            }
+        },
+        {
+            "action": "aws:runShellScript",
+            "name": "activate",
+            "precondition": {
+                "StringEquals": [
+                    "{{ activate }}", "True"
+                ]
+            },
+            "inputs": {
+                "runCommand":[
+                    "sudo /opt/CrowdStrike/falconctl -s --cid={{ cid }}"
+                ]
+            }
+        }
+    ]
+}

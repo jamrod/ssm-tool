@@ -1,4 +1,4 @@
-"""cdk representation of the ssm_parameter_tool stack"""
+"""cdk representation of the ssm_deploy_document_tool stack"""
 # pylint: disable=W0612,R0903,R0914
 from aws_cdk import (
     App,
@@ -12,8 +12,8 @@ from aws_cdk import (
 )
 
 
-class SsmParameterToolStack(Stack):
-    """Entrypoint to the SSM Cleaner application which cleans up ssm parameters"""
+class SsmDeployDocumentStack(Stack):
+    """Entrypoint to the SSM deploy Document application which creates and shares documents"""
 
     def __init__(self, app: App, id_: str, env: dict, stage_params: dict) -> None:
         super().__init__(app, id_)
@@ -29,57 +29,49 @@ class SsmParameterToolStack(Stack):
         )
 
         # iam role
-        ssm_parameter_tool_role = iam.Role(
+        pcm_ssm_deploy_document_tool_role = iam.Role(
             self,
-            "ssm_parameter_tool_role",
+            "ssm_deploy_document_tool_role",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"),
-            role_name="pcm_ssm_parameter_tool_role",
+            role_name="pcm_ssm_deploy_document_tool_role",
         )
-        ssm_parameter_tool_role.add_to_policy(
+        pcm_ssm_deploy_document_tool_role.add_to_policy(
             iam.PolicyStatement(resources=["*"], actions=["sts:AssumeRole"])
         )
-        ssm_parameter_tool_role.add_managed_policy(
+        pcm_ssm_deploy_document_tool_role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name(
                 "service-role/AWSLambdaBasicExecutionRole"
             )
         )
 
         # lambda function
-        ssm_parameter_tool_lambda = lambda_.Function(
+        ssm_deploy_document_tool_lambda = lambda_.Function(
             self,
-            "ssm_parameter_tool_lambda",
-            code=lambda_.Code.from_asset("lambdas/ssm_parameter_tool"),
+            "ssm_deploy_document_tool_lambda",
+            code=lambda_.Code.from_asset("lambdas/ssm_deploy_document_tool"),
             runtime=lambda_.Runtime.PYTHON_3_9,
-            handler="ssm_parameter_tool.lambda_handler",
+            handler="ssm_deploy_document_tool.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),
             layers=[ssm_tool_shared_layer],
-            role=ssm_parameter_tool_role,
+            role=pcm_ssm_deploy_document_tool_role,
             memory_size=512,
-            function_name="pcm_ssm_parameter_tool",
+            function_name="pcm_ssm_deploy_document_tool",
         )
 
         # step function tasks
         init_step = sf_tasks.LambdaInvoke(
             self,
             "init",
-            lambda_function=ssm_parameter_tool_lambda,
+            lambda_function=ssm_deploy_document_tool_lambda,
             payload_response_only=True,
         ).add_retry(
             errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
         )
-        divide_jobs_step = sf_tasks.LambdaInvoke(
+        deploy = sf_tasks.LambdaInvoke(
             self,
-            "divide_jobs",
-            lambda_function=ssm_parameter_tool_lambda,
-            payload_response_only=True,
-        ).add_retry(
-            errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
-        )
-        run_job_step = sf_tasks.LambdaInvoke(
-            self,
-            "run_job",
-            lambda_function=ssm_parameter_tool_lambda,
+            "deploy_step",
+            lambda_function=ssm_deploy_document_tool_lambda,
             payload_response_only=True,
         ).add_retry(
             errors=["States.TaskFailed"], max_attempts=1, interval=Duration.seconds(60)
@@ -87,32 +79,24 @@ class SsmParameterToolStack(Stack):
         error_check_step = sf_tasks.LambdaInvoke(
             self,
             "error_check_step",
-            lambda_function=ssm_parameter_tool_lambda,
+            lambda_function=ssm_deploy_document_tool_lambda,
             payload=step_functions.TaskInput.from_object({"action": "error_check"}),
         ).add_retry(
             errors=["States.TaskFailed"], max_attempts=2, interval=Duration.seconds(60)
         )
 
         # map steps
-        divide_jobs_map = step_functions.Map(
+        deploy_map = step_functions.Map(
             self,
-            "divide_jobs_map",
-        ).iterator(divide_jobs_step)
-        run_jobs_map = step_functions.Map(
-            self,
-            "run_jobs_map",
-        ).iterator(run_job_step)
-        handle_jobs_map = step_functions.Map(
-            self, "handle_jobs_map", output_path="$[0]"
-        ).iterator(run_jobs_map)
+            "deploy_map",
+        ).iterator(deploy)
 
         # state_machine
-        state_machine_ssm_parameter_tool = step_functions.StateMachine(
+        state_machine_ssm_deploy_document_tool = step_functions.StateMachine(
             self,
             "state_machine",
-            state_machine_name="pcm_ssm_parameter_tool_SM",
+            state_machine_name="pcm_ssm_deploy_document_tool_SM",
             definition=step_functions.Chain.start(init_step)
-            .next(divide_jobs_map)
-            .next(handle_jobs_map)
+            .next(deploy_map)
             .next(error_check_step),
         )

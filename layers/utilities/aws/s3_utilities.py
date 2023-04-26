@@ -67,7 +67,9 @@ class S3Utilities:
             )
             for page in res:
                 if "Contents" in page.keys():
-                    output.extend([{"Key": item["Key"]} for item in page["Contents"]])
+                    for item in page["Contents"]:
+                        if item["Key"] != prefix:
+                            output.extend([{"Key": item["Key"]}])
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Exception occured in list_bucket_keys on {bucket}/{prefix} \n{ex}"
             LOGGER.error(msg)
@@ -125,9 +127,9 @@ class S3Utilities:
 
     @log_it
     def get_object_as_dict(self, bucket: str, key: str) -> dict:
-        """Get an object from s3
+        """Get an object from s3, will also return a List if that's what the object is
 
-        Paramters
+        Parameters
         ---------
         bucket : str
             S3 bucket
@@ -154,7 +156,7 @@ class S3Utilities:
     def get_yaml_object_as_dict(self, bucket: str, key: str) -> dict:
         """Get an object from s3
 
-        Paramters
+        Parameters
         ---------
         bucket : str
             S3 bucket
@@ -176,6 +178,33 @@ class S3Utilities:
             LOGGER.error(msg)
             raise Exception(msg) from ex
         return output
+
+    @log_it
+    def get_presigned_url(self, bucket: str, key: str, expiry: int = 3600) -> str:
+        """Get a presigned url for an object on s3
+
+        Parameters
+        ---------
+        bucket : str
+            S3 bucket
+        key : str
+            The key of the object to create a url for
+        expiry : int
+            The number of seconds the url will be valid for defaults to 3600 = 1 hour
+
+        Returns
+        -------
+        str
+
+        """
+        url = ""
+        try:
+            url = self.client.generate_presigned_url("get_object", Params={"Bucket": bucket, "Key": key}, ExpiresIn=expiry)
+        except Exception as ex:  # pylint: disable=broad-except
+            msg = f"Exception occured in getpresigned_url\n{ex.__class__.__name__}: {str(ex)}"
+            LOGGER.error(msg)
+            raise Exception(msg) from ex
+        return url
 
 
 def main():
