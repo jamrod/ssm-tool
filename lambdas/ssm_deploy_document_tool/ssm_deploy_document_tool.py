@@ -83,7 +83,7 @@ class SsmShareDocumentTool:
                     bucket=S3_BUCKET, key=key
                 )
                 doc_name = key[key.rfind("/") + 1: key.rfind(".")]
-                doc_ext = key[key.rfind(".")+1:].upper()
+                doc_ext = key[key.rfind(".") + 1:].upper()
                 if doc_ext == "JSON":
                     doc_format = doc_ext
                 elif doc_ext in ("YML", "YAML"):
@@ -222,7 +222,7 @@ def main(app, event: Dict[str, str]):
             res = [{"action": "deploy", "s3_key": key} for key in job_keys]
         elif action == "deploy":
             s3_key = event.get("s3_key")
-            region = s3_key[s3_key.rfind('/')+1:]
+            region = s3_key[s3_key.rfind('/') + 1:]
             accounts = app.s3_utils.get_object_as_dict(
                 bucket=S3_BUCKET, key=s3_key
             )
