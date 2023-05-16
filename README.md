@@ -88,3 +88,17 @@ To run a jobs via gitlab pipeline:
  - Checkout the main branch.
  - Update existing or put new SSM Documents in the ./documents folder. Name the documents the same as you want it to appear in Systems Manager, must be unique and file format must be either JSON or YAML.
  - Then git add/commit and push. The deploy documents pipeline will start and upload the documents then trigger the state_machine and display results on gitlab
+
+## SSM Run Document Tool
+A tool to run documents on instances
+
+### Basic functionality
+---------
+The SSM Run Document tool is designed to concurrently run documents on AWS EC2 instances across multiple accounts and regions. The run document tool is a State Machine on AWS which accepts an event as JSON with a job to execute. The JSON event has two top level parameters "action" which should always be "init" and "arguments". The "arguments" parameter has two parameters: "document" which is the name of the document to run and "parameters" which contains a JSON string with any parameters which need to be passed to the document. The document must exist in the account and region in which it is to be run, use the SSM Deploy Document tool to achieve this. The instance list must exist on S3 in pcm-shared-code-530786275774/ssm_tool/run_document/instance_list for dev or pcm-shared-code-747207162522/ssm_tool/run_document/instance_list for prod and should be formatted as
+```
+{
+  "region-name": {
+      "account-number": ["instance-id", "instance-id"]
+}
+```
+There is no pipeline established for running the Run Document tool
