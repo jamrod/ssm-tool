@@ -41,8 +41,8 @@ class SsmRunDocumentTool:
                 "parameters": {...}
             }
 
-        incident_list : dict
-            list of incidents organized by region and account
+        instance_list : dict
+            list of ec2 instances organized by region and account
             {
                 "us-east-1": {
                     "530786275774": ["i-01c20c9d586abe17a"],
