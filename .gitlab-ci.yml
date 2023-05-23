@@ -148,7 +148,7 @@ deploy-shared-layer:
 get-accounts:
   stage: get-accounts
   rules:
-    - if: 'GET_PCM_ACCOUNTS != "true"'
+    - if: '$GET_PCM_ACCOUNTS != "true"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
       when: on_success
