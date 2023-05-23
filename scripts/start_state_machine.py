@@ -18,6 +18,8 @@ STATE_MACHINES = {
     "run_document-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_run_document_SM",
     "deploy_document-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_deploy_document_tool_SM",
     "deploy_document-prod": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm_ssm_deploy_document_tool_SM",
+    "get_accounts-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm-ami-bakery-get-accounts",
+    "get_accounts-prod": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm-ami-bakery-get-accounts",
 }
 
 
