@@ -1,7 +1,7 @@
 """Start execution on an SSM Tool state machine"""
 import argparse
 import time
-from layers.utilities.log_it import get_logger, log_it
+from log_it import get_logger, log_it
 from layers.utilities.aws.boto3_utilities import Boto3Utilities
 from layers.utilities.aws.step_function_utilities import SfnUtilities
 
