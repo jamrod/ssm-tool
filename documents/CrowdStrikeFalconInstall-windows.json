@@ -2,29 +2,33 @@
     "schemaVersion": "2.2",
     "description": "Install CrowdStrike Falcon Sensor Windows",
     "parameters": {
-        "presignedurl": {
-            "type": "String"
-        },
-        "cid": {
-            "type": "String",
-            "default": "50E47E6AF55B4A7C93688E7F6AA9E229-A8"
-        }
+      "presignedurl": {
+        "type": "String"
+      },
+      "cid": {
+        "type": "String",
+        "default": "50E47E6AF55B4A7C93688E7F6AA9E229-A8"
+      }
     },
     "mainSteps": [
-        {
-            "action": "aws:runPowerShellScript",
-            "name": "Get_and_Install",
-            "inputs": {
-                "runCommand": [
-                    "cd\\",
-                    "wget -outfile WindowsSensor.MaverickGyr.exe \"{{ presignedurl }}\"",
-                    ".\\WindowsSensor.MaverickGyr.exe /install /quiet /norestart CID={{ cid }}",
-                    "remove-item C:\\WindowsSensor.MaverickGyr.exe -force",
-                    "if (-not(Test-Path C:\\'Program Files'\\CrowdStrike)) {",
-                    "   exit 1",
-                    "}"
-                ]
-            }
+      {
+        "action": "aws:runPowerShellScript",
+        "name": "Get_and_Install",
+        "inputs": {
+          "runCommand": [
+            "cd\\",
+            "$versionInfo = Get-WmiObject -class Win32_OperatingSystem",
+            "if ($versionInfo.version -eq '10.0.14393') {",
+            "   $TLS12Protocol = [System.Net.SecurityProtocolType] 'Ssl3 , Tls12'",
+            "   [System.Net.ServicePointManager]::SecurityProtocol = $TLS12Protocol",
+            "}",
+            "Invoke-WebRequest -outfile WindowsSensor.MaverickGyr.exe \"{{ presignedurl }}\"",
+            ".\\WindowsSensor.MaverickGyr.exe /install /quiet /norestart CID={{ cid }}",
+            "if (-not(Test-Path C:\\'Program Files'\\CrowdStrike)) {",
+            "   exit 1",
+            "}"
+          ]
         }
+      }
     ]
-}
+  }
