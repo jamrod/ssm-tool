@@ -166,13 +166,8 @@ get-accounts:
   script:
     - python3 -m pip install -r layers/utilities/requirements.txt
     - export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
-    - |-
-      $SM_INPUT=$( jq -n \
-        --arg acc_num "${account}" \
-        --arg bucket "pcm-shared-code-${account}" \
-        --arg key "${SHARE_ACCOUNTS_KEY}" \
-        '{ "action": "start", "output": { "account": $acc_num, "bucket": $bucket, "key": $key } }')
-      python3 scripts/start_state_machine.py $ENVIRONMENT get_accounts ssm-tool $SM_INPUT
+    - SM_INPUT='{ "action"':' "start", "output"':' { "account"':' "'${account}'", "bucket"':' "pcm-shared-code-'${account}'", "key"':' "'${SHARE_ACCOUNTS_KEY}'" } }'
+    - python3 scripts/start_state_machine.py $ENVIRONMENT get_accounts ssm-tool """${SM_INPUT}"""
 
 deploy-documents:
   stage: documents
