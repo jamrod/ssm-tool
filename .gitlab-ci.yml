@@ -9,6 +9,7 @@ variables:
 
 stages:
   - lint
+  - deploy-layer
   - cdk
   - get-accounts
   - documents
@@ -48,6 +49,36 @@ lint:
 
 
 ##############################################################################
+# Deploy-layer
+##############################################################################
+
+deploy-shared-layer:
+  stage: deploy-layer
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - layers/**/*
+      when: on_success
+      variables:
+        ROLE_ARN: $DEV_ARN
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - layers/**/*
+      when: on_success
+      variables:
+        ENVIRONMENT: prod
+  services:
+    - docker:18-dind
+  tags:
+    - pcm-prod
+  <<: *assume_role_script
+  script:
+    - echo running synth on SsmSharedLayerStack-${ENVIRONMENT^} ...
+    - cdk synth SsmSharedLayerStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
+    - cdk deploy --app 'cdk.out/' SsmSharedLayerStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
+
+
+##############################################################################
 # CDK
 ##############################################################################
 
@@ -58,7 +89,7 @@ deploy-ssm-paramter-tool:
       changes:
         - infrastructure/ssm_parameter_tool_stack
         - lambdas/ssm_parameter_tool/*
-        - layers/*
+        - layers/**/*
         - app.py
         - parameter_store.json
       when: on_success
@@ -68,7 +99,7 @@ deploy-ssm-paramter-tool:
       changes:
         - infrastructure/ssm_parameter_tool_stack
         - lambdas/ssm_parameter_tool/*
-        - layers/*
+        - layers/**/*
         - app.py
         - parameter_store.json
       when: on_success
@@ -91,6 +122,7 @@ deploy-document-tool:
       changes:
         - infrastructure/ssm_deploy_document_stack
         - lambdas/ssm_deploy_document_tool/*
+        - layers/**/*
         - app.py
         - parameter_store.json
       when: on_success
@@ -100,6 +132,7 @@ deploy-document-tool:
       changes:
         - infrastructure/ssm_deploy_document_stack
         - lambdas/ssm_deploy_document_tool/*
+        - layers/**/*
         - app.py
         - parameter_store.json
       when: on_success
@@ -114,31 +147,6 @@ deploy-document-tool:
     - echo running synth on SsmDeployDocumentStack-${ENVIRONMENT^} ...
     - cdk synth SsmDeployDocumentStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
     - cdk deploy --app 'cdk.out/' SsmDeployDocumentStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
-
-deploy-shared-layer:
-  stage: cdk
-  rules:
-    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - layers/*
-      when: on_success
-      variables:
-        ROLE_ARN: $DEV_ARN
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - layers/*
-      when: on_success
-      variables:
-        ENVIRONMENT: prod
-  services:
-    - docker:18-dind
-  tags:
-    - pcm-prod
-  <<: *assume_role_script
-  script:
-    - echo running synth on SsmSharedLayerStack-${ENVIRONMENT^} ...
-    - cdk synth SsmSharedLayerStack-${ENVIRONMENT^} -c stage=${ENVIRONMENT}
-    - cdk deploy --app 'cdk.out/' SsmSharedLayerStack-${ENVIRONMENT^} -t t_AppID=SVC02522 --require-approval never
 
 
 ###############################################################################

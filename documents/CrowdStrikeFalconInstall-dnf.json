@@ -8,7 +8,10 @@
         "activate": {
             "type": "String",
             "default": "True",
-            "allowedValues": [ "False", "True" ]
+            "allowedValues": [
+                "False",
+                "True"
+            ]
         },
         "cid": {
             "type": "String",

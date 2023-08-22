@@ -183,7 +183,7 @@ class SsmUtilities:
 
     @log_it
     def describe_parameters_(self, filters: List[dict]) -> dict:
-        """calls describe_parameters
+        """Calls describe_parameters which returns info on SSM parameters filtered by the filters
 
         Parameters
         ----------
@@ -204,12 +204,12 @@ class SsmUtilities:
 
     @log_it
     def delete_parameters_(self, names=List[str]) -> dict:
-        """calls delete_parameters
+        """Delete a list of SSM parameters
 
         Parameters
         ----------
         names : List[str]
-            The name of the parameter
+            The names of the parameters to delete
         """
         output = {"deleted": [], "invalid": []}
         limit = 10
@@ -390,7 +390,7 @@ class SsmUtilities:
 
     @log_it
     def create_command_document(self, name=str, content=str, doc_format=str) -> bool:
-        """Create SSM Document
+        """Create SSM command Document
 
         Parameters
         ----------
