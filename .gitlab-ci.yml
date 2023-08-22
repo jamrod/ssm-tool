@@ -159,7 +159,7 @@ get-accounts:
       when: on_success
       variables:
         ROLE_ARN: $DEV_ARN
-        bucket: '530786275774'
+        account: '530786275774'
   tags:
     - pcm-prod
   <<: *assume_role_script
@@ -167,7 +167,7 @@ get-accounts:
     - python3 -m pip install -r layers/utilities/requirements.txt
     - export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
     - SM_INPUT='{ "action"':' "start", "output"':' { "account"':' "'${account}'", "bucket"':' "pcm-shared-code-'${account}'", "key"':' "'${SHARE_ACCOUNTS_KEY}'" } }'
-    - python3 scripts/start_state_machine.py $ENVIRONMENT get_accounts ssm-tool """${SM_INPUT}"""
+    - python3 scripts/start_state_machine.py $ENVIRONMENT get_accounts ssm-tool """${SM_INPUT}""" --wait
 
 deploy-documents:
   stage: documents
