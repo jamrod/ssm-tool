@@ -492,14 +492,14 @@ class SsmUtilities:
             List of accounts to share with
 
         """
-        limit = 500
+        limit = 20
         chunked_accounts = [
             accounts[i: i + limit] for i in range(0, len(accounts), limit)
         ]
         try:
-            for each_500_accounts in chunked_accounts:
+            for each_chunk_accounts in chunked_accounts:
                 self.client.modify_document_permission(
-                    Name=name, PermissionType="Share", AccountIdsToAdd=each_500_accounts
+                    Name=name, PermissionType="Share", AccountIdsToAdd=each_chunk_accounts
                 )
         except Exception as ex:  # pylint: disable=broad-except
             msg = f"Error caught in share_document for {name} \n{ex.__class__.__name__}: {str(ex)}"
