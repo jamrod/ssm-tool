@@ -201,7 +201,8 @@ deploy-documents:
     - export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
     - if [[ -n $SHARE_ACCOUNTS_KEY ]]; then event='{ "action"':' "init", "accounts_key"':' "'$SHARE_ACCOUNTS_KEY'" }'; else event='{ "action"':' "init" }'; fi
     - echo $event
-    - python3.9 scripts/start_state_machine.py ${ENVIRONMENT} deploy_document ssm_tool """${event}""" --wait
+    - python3.9 scripts/start_state_machine.py ${ENVIRONMENT} deploy_document ssm_tool """${event}""" --wait | tee sm-result
+    - grep -E -q "Success!" sm-result
 
 
 ###############################################################################
