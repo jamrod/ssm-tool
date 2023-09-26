@@ -24,7 +24,7 @@
             "name": "Install",
             "inputs": {
                 "runCommand": [
-                    "cd",
+                    "cd /",
                     "sudo curl -o installer-file.rpm \"{{ presignedurl }}\"",
                     "sudo dnf install installer-file.rpm -y",
                     "sudo rm installer-file.rpm",
@@ -42,7 +42,8 @@
             },
             "inputs": {
                 "runCommand":[
-                    "sudo /opt/CrowdStrike/falconctl -s --cid={{ cid }}"
+                    "sudo /opt/CrowdStrike/falconctl -s --cid={{ cid }}",
+                    "[ $(eval ps --no-headers -o comm 1) = systemd ] && sudo systemctl start falcon-sensor || sudo service falcon-sensor start"
                 ]
             }
         }

@@ -21,10 +21,10 @@
             "name": "Install",
             "inputs": {
                 "runCommand": [
-                    "cd",
+                    "cd /",
                     "sudo curl -o installer-file.deb \"{{ presignedurl }}\"",
                     "sudo dpkg -i installer-file.deb",
-                    "sudo apt-get -f install",
+                    "sudo apt-get -fy install",
                     "sudo rm installer-file.deb",
                     "sudo ls /opt/CrowdStrike/falcon-sensor"
                 ]
@@ -40,7 +40,8 @@
             },
             "inputs": {
                 "runCommand":[
-                    "sudo /opt/CrowdStrike/falconctl -s --cid={{ cid }}"
+                    "sudo /opt/CrowdStrike/falconctl -s --cid={{ cid }}",
+                    "[ $(eval ps --no-headers -o comm 1) = systemd ] && sudo systemctl start falcon-sensor || sudo service falcon-sensor start"
                 ]
             }
         }
