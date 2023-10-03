@@ -160,12 +160,12 @@ get-accounts:
   rules:
     - if: '$GET_PCM_ACCOUNTS != "true"'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
       variables:
         ENVIRONMENT: prod
         account: '747207162522'
-    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH != "main"'
       when: on_success
       variables:
         ROLE_ARN: $DEV_ARN
