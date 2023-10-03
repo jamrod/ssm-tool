@@ -6,6 +6,8 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   SHARE_ACCOUNTS_KEY: ssm_tool/accounts_list
   GET_PCM_ACCOUNTS: 'true' # if 'true' use SHARE_ACCOUNTS_KEY as the output key
+  DEPLOY_DOCUMENTS: 'true' # if 'true' deploy documents to all accounts
+  RUN_PARAMETER_JOBS: 'false' # if 'true' run jobs in "jobs/parameter_tool"
 
 stages:
   - lint
@@ -180,15 +182,11 @@ get-accounts:
 deploy-documents:
   stage: documents
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - documents/*
+    - if: '$CI_COMMIT_BRANCH == "main" && $DEPLOY_DOCUMENTS == "true"'
       when: on_success
       variables:
         ENVIRONMENT: prod
-    - if: '$CI_COMMIT_BRANCH != "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - documents/*
+    - if: '$CI_COMMIT_BRANCH != "main" && $DEPLOY_DOCUMENTS == "true"'
       when: on_success
       variables:
         ROLE_ARN: $DEV_ARN
@@ -211,12 +209,10 @@ deploy-documents:
 run-parameter-jobs:
   stage: run-jobs
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $ENVIRONMENT == "prod"'
-      changes:
-        - jobs/parameter_tool/*.json
-    - if: '$CI_PIPELINE_SOURCE == "push" && $ENVIRONMENT == "dev"'
-      changes:
-        - jobs/parameter_tool/*.json
+    - if: '$RUN_PARAMETER_JOBS == "true" && $ENVIRONMENT == "prod"'
+      when: on_success
+    - if: '$RUN_PARAMETER_JOBS == "true" && $ENVIRONMENT == "dev"'
+      when: on_success
       variables:
         ROLE_ARN: $DEV_ARN
   tags:
