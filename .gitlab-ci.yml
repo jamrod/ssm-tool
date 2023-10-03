@@ -5,8 +5,8 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://docker:2375/
   SHARE_ACCOUNTS_KEY: ssm_tool/accounts_list
-  GET_PCM_ACCOUNTS: 'true' # if 'true' use SHARE_ACCOUNTS_KEY as the output key
-  DEPLOY_DOCUMENTS: 'true' # if 'true' deploy documents to all accounts
+  GET_PCM_ACCOUNTS: 'false' # if 'true' use SHARE_ACCOUNTS_KEY as the output key
+  DEPLOY_DOCUMENTS: 'false' # if 'true' deploy documents to all accounts
   RUN_PARAMETER_JOBS: 'false' # if 'true' run jobs in "jobs/parameter_tool"
 
 stages:
