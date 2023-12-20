@@ -37,9 +37,11 @@ The SSM Parameter tool is a State Machine on AWS which accepts an event as JSON 
  - The execution ends with a final error check to determine if there were any failures across any account/region
 
 ### How To
+-----
 To run a jobs via gitlab pipeline:
  - Checkout a new branch.
- - Set the ENVIRONMENT variable in .gitlab-ci.yml to "prod".
+ - Set the ENVIRONMENT variable in .gitlab-ci.yml to prod.
+ - Set the RUN_PARAMETER_JOBS variable in the .gitlab-ci.yaml to 'true'
  - Copy one of the sample event JSON files from 'ci/test/events' to 'jobs/parameter_tool/' and edit to suit your needs.
  - Then git add/commit and push. The 'run-parameter-job.sh' script will automatically execute any .json files in the 'jobs/parameter_tool/' folder and display the results in gitlab.
 To run jobs locally (Mac and Ubuntu):
@@ -49,8 +51,39 @@ To run jobs locally (Mac and Ubuntu):
 #### Current options
 Currently there are jobs defined for "create", "update", "delete", "rename" or "fix_tags".
 
+#### Anatomy of a job.json
+Json for all jobs have three keys,
+ - "*action*": Always "init" for all jobs
+ - "*job_action*": Set to one of "create", "update", "delete", "rename" or "fix_tags"
+ - "*args*": A dictionary which defines the information specific to the job
 
-Update event:
+##### Create
+There is a "names_values" dictionary in "args" which contains key value pairs representing the parameters you would like to add.
+There is a "tags" list which has tags to be applied to the new parameter as dictionaries containing "Key": "key_name", "Value: "value" pairs
+
+Create Example
+```
+{
+    "action": "init",
+    "job_action": "create",
+    "args": {
+        "names_values": {
+            "new_parameter_name": "new parameter value"
+        },
+        "tags": [
+            {"Key": "t_environment", "Value": "DEV"},
+            {"Key": "t_AppID", "Value": "SVC02522"},
+            {"Key": "t_dcl", "Value": "1"}
+        ]
+    }
+}
+```
+
+##### Update
+There is a "names_values" dictionary in "args" which contains key value pairs representing the parameters you would like to update and the new value for those parameters.
+There is a "tags" list which has tags to be applied to the updated parameter as dictionaries containing "Key": "key_name", "Value: "value" pairs
+
+Update:
 ```
 {
     "action": "init",
@@ -68,6 +101,24 @@ Update event:
     }
 }
 ```
+
+#### Delete
+In the case of "delete" the "args" contains a "names" list which has the name of any parameter you would like to remove from the parameter store.
+
+Delete example:
+```
+{
+    "action": "init",
+    "job_action": "remove",
+    "args": {
+        "names": [
+            "name_of_parameter_to_delete"
+        ]
+    }
+}
+```
+
+
 
 Optionally, a different account list may be provided by uploading to the pcm-shared-code-747207162522 (or 530786275774 for dev) s3 bucket and then passing the s3 key to the event as "accounts_key".
 

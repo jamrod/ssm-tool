@@ -1,35 +1,28 @@
 #!/bin/bash
-if [ ${1} == 'dev' ]
-    then
-      stage=dev
-      role=devinator
-  elif [ ${1} == 'prod' ]
-    then
-      stage=prod
-      role=govinator
-  else
-    echo invalid argument $1 try dev or prod
-    exit 1
+# Run cdk deploy for specified stage and stack
+declare -A STACKS=( \
+  [parameter]=SsmParameterToolStack \
+  [layer]=SsmSharedLayerStack \
+  [run-document]=SsmRunDocumentStack \
+  [deploy-document]=SsmDeployDocumentStack \
+)
+ERR_MSG="Missing parameter(s), 'deploy.sh stage stack' stages = DEV PRD; stacks = ${!STACKS[@]}"
+if [[ "dev DEV Dev" =~ $1 ]]; then
+    stage=DEV
+    role=devinator
+    elif [[ "prod PROD Prod prd PRD Prd" =~ $1 ]]; then
+        stage=PRD
+        role=govinator
+    else
+        echo $ERR_MSG && exit 1
 fi
-stack=$2
-if [ -z ${stack} ]; then
-  echo 'Missing parameter(s), deploy.sh dev layer|parameter|run-document|deploy-document'
-  exit 1
+shift
+stack=$1
+if [[ ! ${!STACKS[@]} =~ ${stack} ]]; then  # if the stack is not declared as a key in the associative array STACKS
+    echo $ERR_MSG && exit 1
 fi
-echo Running deploy on ${stage} ${stack}
-case $stack in
-parameter)
-  aws-runas ${role} cdk deploy --app 'cdk.out/' SsmParameterToolStack-${stage^} --require-approval never -c stage=${stage}
-;;
-layer)
-  aws-runas ${role} cdk deploy --app 'cdk.out/' SsmSharedLayerStack-${stage^} --require-approval never -c stage=${stage}
-;;
-run-document)
-  aws-runas ${role} cdk deploy --app 'cdk.out/' SsmRunDocumentStack-${stage^} --require-approval never -c stage=${stage}
-;;
-deploy-document)
-  aws-runas ${role} cdk deploy --app 'cdk.out/' SsmDeployDocumentStack-${stage^} --require-approval never -c stage=${stage}
-;;
-esac
+echo Running deploy for ${stack} ${stage}
 
-[[ $? -gt 0 ]] || echo Complete!
+aws-runas ${role} cdk deploy --app 'cdk.out/' ${STACKS[$stack]} --require-approval never -c stage=${stage}
+
+[[ $? -gt 0 ]] && exit 1 || echo Complete!

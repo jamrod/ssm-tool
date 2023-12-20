@@ -3,13 +3,12 @@
     "job_action": "update",
     "args": {
         "names_values": {
-            "test_param": "new string again"
+            "name_of_parameter_to_update": "new parameter value"
         },
         "tags": [
             {"Key": "t_environment", "Value": "DEV"},
             {"Key": "t_AppID", "Value": "SVC02522"},
-            {"Key": "t_dcl", "Value": "1"},
-            {"Key": "test_tag", "Value": "test"}
+            {"Key": "t_dcl", "Value": "1"}
         ]
     }
 }

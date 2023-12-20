@@ -3,7 +3,7 @@
     "job_action": "remove",
     "args": {
         "names": [
-            "name_of_parameter_to_delete"
+            "test_parameter"
         ]
     }
 }

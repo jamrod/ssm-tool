@@ -1,15 +1,15 @@
 """cdk representation of the SSM Tool shared layer stack"""
 # pylint: disable=W0612,R0903
-from aws_cdk import aws_lambda as lambda_, App, RemovalPolicy, Stack, aws_ssm
+from aws_cdk import aws_lambda, RemovalPolicy, Stack, aws_ssm
 from aws_cdk.aws_lambda_python_alpha import PythonLayerVersion
+from constructs import Construct
 
 
 class SsmSharedLayerStack(Stack):
     """Creates a shared layer for use in the SSM Tool cdk stacks"""
 
-    def __init__(self, app: App, id_: str, env: dict) -> None:
-        super().__init__(app, id_)
-        self.env = env
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
 
         # Create layer
         ssm_tool_shared_layer = PythonLayerVersion(
@@ -17,7 +17,7 @@ class SsmSharedLayerStack(Stack):
             "ssm_tool_shared_layer",
             entry="layers/utilities",
             description="Shared utilities",
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            compatible_runtimes=[aws_lambda.Runtime.PYTHON_3_11],
             removal_policy=RemovalPolicy.RETAIN,
         )
 
