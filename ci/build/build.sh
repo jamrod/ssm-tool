@@ -1,29 +1,27 @@
 #!/bin/bash
-#!/bin/bash
-stage=$1
-stack=$2
-if [[ -z ${stack} ]]; then
-    echo 'Missing parameter(s), build.sh dev layer|parameter|run-document|deploy-document'
-    exit 1
-fi
-echo running synth on $stack ${stage^}
-case $stack in
-parameter)
-    cdk synth SsmParameterToolStack-${stage^} -c stage=${stage}
-    ;;
-layer)
-    cdk synth SsmSharedLayerStack-${stage^} -c stage=${stage}
-    ;;
-run-document)
-    cdk synth SsmRunDocumentStack-${stage^} -c stage=${stage}
-    ;;
-deploy-document)
-    cdk synth SsmDeployDocumentStack-${stage^} -c stage=${stage}
-    ;;
-*)
-    echo invalid argument $stack, try: layer, parameter, document
-    exit 1
-    ;;
-esac
+# Runs cdk synth for specified stage and stack
+declare -A STACKS=(  \
+  [parameter]=SsmParameterToolStack \
+  [layer]=SsmSharedLayerStack \
+  [run-document]=SsmRunDocumentStack \
+  [deploy-document]=SsmDeployDocumentStack \
+)
+ERR_MSG="Missing parameter(s), 'build.sh stage stack' stages = DEV PRD; stacks = ${!STACKS[@]}"
 
-[[ $? -gt 0 ]] || echo Complete!
+if [[ "dev DEV Dev" =~ $1 ]]; then
+    stage=DEV
+    elif [[ "prod PROD Prod prd PRD Prd" =~ $1 ]]; then
+        stage=PRD
+    else
+        echo $ERR_MSG && exit 1
+fi
+
+shift
+stack=$1
+if [[ ! ${!STACKS[@]} =~ ${stack} ]]; then  # if the stack is not declared as a key in the associative array STACKS
+    echo ERR_MSG && exit 1
+fi
+
+echo running synth on ${STACKS[$stack]} $stage
+cdk synth ${STACKS[$stack]} -e -c stage=${stage}
+[[ $? -gt 0 ]] && exit 1 || echo Complete!

@@ -3,13 +3,12 @@
     "job_action": "create",
     "args": {
         "names_values": {
-            "test_param": "test parameter"
+            "new_parameter_name": "new parameter value"
         },
         "tags": [
             {"Key": "t_environment", "Value": "DEV"},
             {"Key": "t_AppID", "Value": "SVC02522"},
-            {"Key": "t_dcl", "Value": "1"},
-            {"Key": "test_tag", "Value": "test"}
+            {"Key": "t_dcl", "Value": "1"}
         ]
     }
 }

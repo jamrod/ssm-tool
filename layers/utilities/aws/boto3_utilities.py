@@ -21,9 +21,7 @@ class Boto3Utilities:
     DEFAULT_STS_ROLE_NAME = STS_ROLE_NAME
 
     default_config = CONFIG.Config(
-        retries=dict(
-            max_attempts=10   # docs say default is 5
-        )
+        retries={"max_attempts": 10}  # docs say default is 5
     )
 
     default_region = DEFAULT_REGION

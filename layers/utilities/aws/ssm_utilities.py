@@ -16,7 +16,7 @@ class SsmUtilities:
     """Methods for interacting with the boto3 aws ssm client"""
 
     def __init__(self, client: ssmClient) -> None:
-        """Initialize a SsmUtilities object
+        """Initialize an SsmUtilities object
 
         Parameters
         ----------
@@ -28,6 +28,8 @@ class SsmUtilities:
     @log_it
     def put_parameter_(self, name: str, value: str) -> bool:
         """Put a parameter value
+        This should be used to edit a parameter value since it will not affect tags
+        Use put_parameter_with tags to create a new tagged parameter
 
         Parameters
         ----------
@@ -48,7 +50,7 @@ class SsmUtilities:
 
     @log_it
     def put_parameter_with_tags(self, name: str, value: str, tags: List[dict]) -> bool:
-        """Put a parameter value
+        """Put a new parameter key/value with tags
 
         Parameters
         ----------
@@ -57,7 +59,7 @@ class SsmUtilities:
         value : str
             The value for the parameter
         tags : List[dict]
-            List of tags as dicts
+            List of tags as dicts [{"Key": "key_name", "Value: "value"},...]
         """
         try:
             self.client.put_parameter(Name=name, Value=value, Type="String", Tags=tags)
@@ -69,14 +71,14 @@ class SsmUtilities:
 
     @log_it
     def add_tags_to_parameter(self, name: str, tags: List[dict]) -> bool:
-        """Add tags to a parameter
+        """Add tags to an existing parameter
 
         Parameters
         ----------
         name : str
             The name of the parameter
         tags : List[dict]
-            List of tags as dicts
+            List of tags as dicts [{"Key": "key_name", "Value: "value"},...]
         """
         try:
             self.client.add_tags_to_resource(
@@ -99,7 +101,7 @@ class SsmUtilities:
         name : str
             The name of the parameter
         tags : List[dict]
-            List of tags as dicts
+            List of tags as dicts [{"Key": "key_name", "Value: "value"},]
         """
         try:
             self.client.remove_tags_from_resource(
@@ -157,12 +159,12 @@ class SsmUtilities:
 
     @log_it
     def get_parameters_(self, names: List[str]) -> dict:
-        """calls get_parameters, limit 10 per call
+        """calls get_parameters
 
         Parameters
         ----------
         names : List[str]
-            The name of the parameter
+            The names of the parameters to get ["parameter_name",]
         """
         output = []
         limit = 10
@@ -188,7 +190,8 @@ class SsmUtilities:
         Parameters
         ----------
         filters : List[dict]
-            The filter to use to reduce results
+            The filters to use to reduce results
+                example: [ {"Key": "tag:t_dcl", "Values": ["2"]} ]
         """
         try:
             paginator = self.client.get_paginator("describe_parameters")

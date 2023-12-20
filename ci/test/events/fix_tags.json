@@ -3,13 +3,13 @@
     "job_action": "fix-tags",
     "args": {
         "to_update": {
-            "test_tag": ["test"]
+            "name_of_tag_to_update": ["list_of", "values", "to_replace"]
         },
         "tags": [
             {"Key": "t_environment", "Value": "DEV"},
             {"Key": "t_AppID", "Value": "SVC02522"},
             {"Key": "t_dcl", "Value": "1"},
-            {"Key": "test_tag", "Value": "updated"}
+            {"Key": "name_of_tag_to_update", "Value": "new value"}
         ]
     }
 }
