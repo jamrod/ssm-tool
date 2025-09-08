@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "2.2",
+  "description": "Download, install and activate a Qualys Agent for Linux.",
+  "platformsDetails": {
+    "Linux": {}
+  },
+  "parameters": {
+    "CustomerId": {
+      "type": "String",
+      "description": "The Qualys customer id.",
+      "default": "f671c9cf-049d-c280-81c2-6d69f46117a7"
+    },
+    "ActivationId": {
+      "type": "String",
+      "description": "The Qualys activation id.",
+      "default": "aca503ad-2320-46fa-bf12-2d8490e2e84b"
+    },
+    "ServerURI": {
+      "type": "String",
+      "description": "The Qualys server URI.",
+      "default": "https://qagpublic.qg1.apps.qualys.eu/CloudAgent/"
+    },
+    "DownloadUrl": {
+      "type": "String",
+      "description": "Where to download the agent installer from. Leaving this blank will detect the OS and install the\nlatest from https://package-manager.pearsoncloudmanagement.com/scanners/qualys/qualys-cloud-agent-linux\n",
+      "default": ""
+    }
+  },
+  "mainSteps": [
+    {
+      "action": "aws:runShellScript",
+      "name": "install",
+      "inputs": {
+        "runCommand": [
+            "set -e",
+            "detect_system() {",
+            "    ARCH=$(uname -m)",
+            "    if [ \"${ARCH}\" = \"x86_64\" ]; then",
+            "        arch=x_64",
+            "    elif [ \"${ARCH}\" = \"aarch64\" ]; then",
+            "        arch=arm_64",
+            "    else",
+            "        echo ERROR: Unrecognized architecture $ARCH && exit 1",
+            "    fi",
+            "    if [ -f /etc/os-release ]; then",
+            "        # Latest OS versions",
+            "        . /etc/os-release",
+            "        if [ \"$ID\" = \"ubuntu\" ] || [ \"$ID_LIKE\" = \"debian\" ]; then",
+            "            echo \"$arch deb\"",
+            "            return 0",
+            "        fi",
+            "        if [ \"$ID\" = \"rhel\" ] || [[ \"$ID_LIKE\" =~ \"fedora\" ]]; then",
+            "            echo \"$arch rpm\"",
+            "            return 0",
+            "        fi",
+            "    echo ERROR: Could not identify platform && exit 1",
+            "    fi",
+            "}",
+            "",
+            "build_url() {",
+            "    local arch=$1",
+            "    local platform=$2",
+            "    local base_url=https://package-manager.pearsoncloudmanagement.com/scanners/qualys/qualys-cloud-agent-linux",
+            "    if [ \"$platform\" = \"rpm\" ]; then",
+            "        echo ${base_url}-${arch}_latest.rpm",
+            "        return 0",
+            "    fi",
+            "    if [ \"$platform\" = \"deb\" ]; then",
+            "        echo ${base_url}_ubuntu-${arch}_latest.deb",
+            "        return 0",
+            "    fi",
+            "    echo ERROR: Unsupported platform $platform && exit 1",
+            "}",
+            "",
+            "system=$(detect_system)",
+            "if [ -z ${DownloadUrl} ]; then",
+            "    DownloadUrl=$(build_url $system)",
+            "fi",
+            "echo $DownloadUrl",
+            "install_file=/tmp/install.${system##* }",
+            "if curl -f -o $install_file $DownloadUrl; then",
+            "    echo \"Download complete\"",
+            "else",
+            "    echo download failed",
+            "    exit 1",
+            "fi",
+            "if [ -f $install_file ]; then",
+            "    set +e",
+            "    if [ \"${system##* }\" = \"rpm\" ]; then",
+            "        [[ $(ps -e | grep -q qualys-cloud-ag && echo $?) ]] && sudo rpm -Uvh $install_file || sudo rpm -ivh $install_file # upgrade if already installed else install",
+            "    elif [ \"${system##* }\" = \"deb\" ]; then",
+            "        sudo dpkg -i $install_file",
+            "    fi",
+            "    rm -f $install_file",
+            "else",
+            "    echo ERROR: Download failed for $DownloadUrl && exit 1",
+            "fi",
+            "ps -e | grep qualys-cloud-ag",
+            "if [ $? ];then",
+            "    echo Qualys installation complete",
+            "else",
+            "    echo Qualys agent not detected, failing!!!",
+            "    exit 1",
+            "fi"
+        ]
+      }
+    }
+  ]
+}

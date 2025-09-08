@@ -48,7 +48,7 @@ class SsmRunDocumentStack(Stack):
             self,
             "ssm_run_document_lambda",
             code=aws_lambda.Code.from_asset("lambdas/ssm_run_document"),
-            runtime=aws_lambda.Runtime.PYTHON_3_11,
+            runtime=aws_lambda.Runtime.PYTHON_3_13,
             handler="ssm_run_document.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),

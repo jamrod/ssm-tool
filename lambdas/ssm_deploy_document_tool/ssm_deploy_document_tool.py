@@ -147,7 +147,7 @@ class SsmShareDocumentTool:
     @log_it
     def post_error(self, err: str, caller: str) -> bool:
         """Post error to S3"""
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.now(datetime.UTC)
         key_name = f"ssm_tool/deploy_document/errors/{caller}/{timestamp.strftime('%Y%m%d-%H%M%S%f')}.txt"
         self.s3_utils.put_object_(
             data=json.dumps(err, default=str, indent=2),
@@ -232,7 +232,7 @@ def main(app, event: Dict[str, str]):
             app.check_for_errors()
             res = {"result": "Success!"}
         else:
-            timestamp = datetime.datetime.utcnow()
+            timestamp = datetime.datetime.now(datetime.UTC)
             msg = f"Unknown action, {action}, in event at {timestamp}"
             LOGGER.error(msg)
             raise SsmToolException(msg)

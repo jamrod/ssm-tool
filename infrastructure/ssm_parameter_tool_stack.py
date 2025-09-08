@@ -48,7 +48,7 @@ class SsmParameterToolStack(Stack):
             self,
             "ssm_parameter_tool_lambda",
             code=aws_lambda.Code.from_asset("lambdas/ssm_parameter_tool"),
-            runtime=aws_lambda.Runtime.PYTHON_3_11,
+            runtime=aws_lambda.Runtime.PYTHON_3_13,
             handler="ssm_parameter_tool.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),
