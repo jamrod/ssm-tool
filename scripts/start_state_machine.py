@@ -15,11 +15,11 @@ MAX_WAIT = (
 
 LOGGER = get_logger("LOG_LEVEL", "info")
 STATE_MACHINES = {
-    "run_document-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_run_document_SM",
-    "deploy_document-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_deploy_document_tool_SM",
-    "deploy_document-prod": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm_ssm_deploy_document_tool_SM",
-    "get_accounts-dev": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm-ami-bakery-get-accounts",
-    "get_accounts-prod": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm-ami-bakery-get-accounts",
+    "run_document-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_run_document_SM",
+    "deploy_document-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_deploy_document_tool_SM",
+    "deploy_document-PRD": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm_ssm_deploy_document_tool_SM",
+    "get_accounts-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm-ami-bakery-get-accounts",
+    "get_accounts-PRD": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm-ami-bakery-get-accounts",
 }
 
 
@@ -96,7 +96,7 @@ def main(stage: str, call: str, name: str, input_string: str, wait: bool) -> str
         str
     """
     account = DEV_ACCOUNT
-    if stage == "prod":
+    if stage == "PRD":
         account = PROD_ACCOUNT
     arn = STATE_MACHINES.get(f"{call}-{stage}", None)
     if not arn:
@@ -120,7 +120,7 @@ def main(stage: str, call: str, name: str, input_string: str, wait: bool) -> str
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("env", help="The ci stage, generally 'dev' or 'prod'")
+    parser.add_argument("env", help="The ci stage, generally 'DEV' or 'PRD'")
     parser.add_argument("call", help="The statemachine to start")
     parser.add_argument("name", help="name for the execution")
     parser.add_argument(
