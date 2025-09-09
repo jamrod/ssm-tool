@@ -1,9 +1,6 @@
 {
   "schemaVersion": "2.2",
   "description": "Download, install and activate a Qualys Agent for Linux.",
-  "platformsDetails": {
-    "Linux": {}
-  },
   "parameters": {
     "CustomerId": {
       "type": "String",

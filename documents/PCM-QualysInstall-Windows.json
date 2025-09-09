@@ -1,9 +1,6 @@
 {
   "schemaVersion": "2.2",
   "description": "Download, install, and link a Qualys Agent for Windows.",
-  "platformsDetails": {
-    "Windows": {}
-  },
   "parameters": {
     "CustomerId": {
       "type": "String",
