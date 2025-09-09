@@ -48,7 +48,7 @@ class SsmDeployDocumentStack(Stack):
             self,
             "ssm_deploy_document_tool_lambda",
             code=aws_lambda.Code.from_asset("lambdas/ssm_deploy_document_tool"),
-            runtime=aws_lambda.Runtime.PYTHON_3_13,
+            runtime=aws_lambda.Runtime.PYTHON_3_11,
             handler="ssm_deploy_document_tool.lambda_handler",
             environment=self.stage_params,
             timeout=Duration.minutes(15),

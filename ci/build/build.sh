@@ -19,7 +19,7 @@ fi
 shift
 stack=$1
 if [[ ! ${!STACKS[@]} =~ ${stack} ]]; then  # if the stack is not declared as a key in the associative array STACKS
-    echo ERR_MSG && exit 1
+    echo $ERR_MSG && exit 1
 fi
 
 echo running synth on ${STACKS[$stack]} $stage

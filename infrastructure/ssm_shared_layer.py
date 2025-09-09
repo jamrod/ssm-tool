@@ -17,7 +17,7 @@ class SsmSharedLayerStack(Stack):
             "ssm_tool_shared_layer",
             entry="layers/utilities",
             description="Shared utilities",
-            compatible_runtimes=[aws_lambda.Runtime.PYTHON_3_11, aws_lambda.Runtime.PYTHON_3_13],
+            compatible_runtimes=[aws_lambda.Runtime.PYTHON_3_11],
             removal_policy=RemovalPolicy.RETAIN,
         )
 
