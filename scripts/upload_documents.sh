@@ -2,7 +2,7 @@
 
 ENVMNT=$1
 
-if [[ ${ENVMNT} == "prod" ]]
+if [[ ${ENVMNT} == "PRD" ]]
   then
     BUCKET=pcm-shared-code-747207162522
   else

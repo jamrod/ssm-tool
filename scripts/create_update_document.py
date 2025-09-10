@@ -59,7 +59,7 @@ def main(stage: str, name: str, doc_path: str) -> str:
         str
     """
     account = DEV_ACCOUNT
-    if stage == "prod":
+    if stage == "PRD":
         account = PROD_ACCOUNT
     ssm_utils = SsmUtilities(
         Boto3Utilities().get_boto3_client(account, "ssm", ROLE_NAME)
@@ -78,7 +78,7 @@ def main(stage: str, name: str, doc_path: str) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("env", help="The ci stage, generally 'dev' or 'prod'")
+    parser.add_argument("env", help="The ci stage, generally 'DEV' or 'PRD'")
     parser.add_argument("name", help="name for the execution")
     parser.add_argument("doc_path", help="path to the document")
     args = parser.parse_args()
