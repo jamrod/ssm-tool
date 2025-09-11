@@ -2,6 +2,9 @@
 --------
 A set of tools to interact with SSM Utilities
 
+ - Parameter tool : Create, Update or Delete Parameters accross a list of accounts
+ - Deploy Document tool : 
+
 ###
 Accounts Lists
 -------------
