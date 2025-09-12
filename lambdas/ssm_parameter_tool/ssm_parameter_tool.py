@@ -13,7 +13,7 @@ LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "inf
 ROLE = os.environ.get("ROLE", "PCMCloudAdmin")
 S3_ACCOUNT = os.environ.get("S3_ACCOUNT", "530786275774")
 S3_BUCKET = os.environ.get("S3_BUCKET", "pcm-shared-code-530786275774")
-STAGE = os.environ.get("STAGE", "dev")
+STAGE = os.environ.get("STAGE", "DEV")
 TAGS = [
     {"Key": "t_environment", "Value": os.environ.get("T_ENV_TAG", "DEV")},
     {"Key": "t_AppID", "Value": "SVC02522"},
@@ -58,7 +58,7 @@ class SsmParameterTool:
         args : dict
             Dict of args to be passed to the job
             {
-                "to_update": "dev"
+                "to_update": "DEV"
             }
 
         account_list : dict
