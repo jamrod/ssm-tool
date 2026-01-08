@@ -1,0 +1,23 @@
+name: lint repo
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: arm-ubuntu24
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: bash ci/lint/lint-project.sh

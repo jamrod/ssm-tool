@@ -1,0 +1,32 @@
+name: dev deploy-document-tool stack lint and deploy
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - "layers/**/*"
+      - "infrastructure/ssm_deploy_document_stack"
+      - "lambdas/ssm_deploy_document_tool/*"
+      - "app.py"
+      - "parameter_store.json"
+      - "trigger_file"
+
+jobs:
+  Lint:
+    uses: ./.github/workflows/lint.yml
+
+  Deploy-shared-layer:
+    needs: Lint
+    uses: ./.github/workflows/deploy-shared-layer.yml
+    with:
+      stage: DEV
+      role_arn: arn:aws:iam::530786275774:role/PCMCloudAdmin
+      stack: SsmSharedLayerStack
+
+  Deploy-ssm-deploy-document-tool:
+    needs: Deploy-shared-layer
+    uses: ./.github/workflows/deploy.yml
+    with:
+      stage: DEV
+      role_arn: arn:aws:iam::530786275774:role/PCMCloudAdmin
+      stack: SsmDeployDocumentStack

@@ -1,0 +1,81 @@
+name: Detect File Changes
+on:
+  workflow_call:
+    inputs:
+      patterns:
+        description: 'JSON object mapping output names to regex patterns to check (e.g., {"python": "\\.py$", "docs": "^docs/"})'
+        type: string
+        required: true
+    outputs:
+      results:
+        description: 'JSON object with boolean results for each pattern'
+        value: ${{ jobs.detect.outputs.results }}
+
+jobs:
+  detect:
+    runs-on: arm-ubuntu24
+    outputs:
+      results: ${{ steps.check.outputs.results }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Need full history for git diff
+
+      - name: Detect changed files
+        id: check
+        run: |
+          # Get the base commit to compare against
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            # For push events, compare with previous commit
+            BASE_SHA="${{ github.event.before }}"
+            # If this is the first commit, compare with empty tree
+            if [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
+              BASE_SHA=$(git hash-object -t tree /dev/null)
+            fi
+          fi
+
+          # Get list of changed files
+          CHANGED_FILES=$(git diff --name-only $BASE_SHA ${{ github.sha }})
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Parse the input patterns JSON
+          PATTERNS='${{ inputs.patterns }}'
+
+          # Build results JSON
+          RESULTS="{"
+          FIRST=true
+
+          # Process each pattern
+          echo "$PATTERNS" | jq -r 'to_entries | .[] | @base64' | while read -r entry; do
+            KEY=$(echo "$entry" | base64 -d | jq -r '.key')
+            PATTERN=$(echo "$entry" | base64 -d | jq -r '.value')
+
+            # Check if any changed file matches the pattern
+            if echo "$CHANGED_FILES" | grep -qE "$PATTERN"; then
+              MATCH="true"
+            else
+              MATCH="false"
+            fi
+
+            echo "$KEY: $MATCH"
+
+            # Add to results (need to handle this differently for workflow output)
+            if [ "$FIRST" = true ]; then
+              RESULTS="${RESULTS}\"${KEY}\":${MATCH}"
+              FIRST=false
+            else
+              RESULTS="${RESULTS},\"${KEY}\":${MATCH}"
+            fi
+          done
+
+          # Close JSON object
+          RESULTS="${RESULTS}}"
+
+          # Output the results
+          echo "results=$RESULTS" >> $GITHUB_OUTPUT
+          echo "Final results: $RESULTS"

@@ -1,0 +1,24 @@
+name: prod lint and deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "layers/**/*"
+      - "infrastructure/*"
+      - "lambdas/**/*"
+      - "app.py"
+      - "parameter_store.json"
+      - "trigger_file"
+
+jobs:
+  Lint:
+    uses: ./.github/workflows/lint.yml
+
+  Deploy:
+    needs: Lint
+    uses: ./.github/workflows/deploy.yml
+    with:
+      stage: PRD
+      role_arn: arn:aws:iam::747207162522:role/PCMCloudAdmin
+      stack: SharepointExporterStack

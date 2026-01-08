@@ -1,0 +1,41 @@
+name: Deploy Stack
+on:
+  workflow_call:
+    inputs:
+      stage:
+        description: 'The deployment stage (e.g., DEV, PRD)'
+        type: string
+        required: true
+      role_arn:
+        description: 'The ARN of the role to assume for deployment'
+        type: string
+        required: true
+      stack:
+        description: 'The name of the CDK stack to deploy'
+        type: string
+        required: true
+
+concurrency:
+  group: deploy-${{ inputs.stack }}-${{ inputs.stage }}
+  cancel-in-progress: false  # Wait for previous deployment to finish if any
+
+jobs:
+  synth_and_deploy:
+    runs-on: x86-ol9-python3_11cdk
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: add layer to python path
+        run: |
+          export PYTHONPATH=${GITHUB_WORKSPACE}/layers/utilities:${PYTHONPATH}
+          echo "PYTHONPATH=${PYTHONPATH}" >> $GITHUB_ENV
+
+      - name: Assume role
+        run: ci/assume_role.sh ${{ inputs.role_arn }}
+
+      - name: synth and deploy
+        run: |
+          cdk synth ${{ inputs.stack }} -e -c stage=${{ inputs.stage }} --quiet
+          cdk deploy ${{ inputs.stack }} -c stage=${{ inputs.stage }} --require-approval never --quiet
