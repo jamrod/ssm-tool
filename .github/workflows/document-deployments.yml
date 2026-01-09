@@ -1,0 +1,99 @@
+name: Deploy SSM Documents
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'The deployment stage (e.g., DEV, PRD)'
+        required: true
+        type: choice
+        options:
+          - DEV
+          - PRD
+      share_accounts_key:
+        description: "Leave empty to deploy to all PCM managed accounts or use to set location on S3 to get a list of accounts, bucket will be pcm-shared-code-{account-based-on-stage}"
+        required: false
+        type: string
+
+env:
+  DEFAULT_ACCOUNTS_KEY: ssm_tool/accounts_list
+
+jobs:
+  # Set environment configuration based on stage
+  set-environment:
+    runs-on: arm-ubuntu24
+    outputs:
+      account: ${{ steps.config.outputs.account }}
+      role_arn: ${{ steps.config.outputs.role_arn }}
+      bucket: ${{ steps.config.outputs.bucket }}
+    steps:
+      - name: Set configuration
+        id: config
+        run: |
+          if [[ "${{ inputs.stage }}" == "PRD" ]]; then
+            echo "account=747207162522" >> $GITHUB_OUTPUT
+            echo "role_arn=arn:aws:iam::747207162522:role/PCMCloudAdmin" >> $GITHUB_OUTPUT
+            echo "bucket=pcm-shared-code-747207162522" >> $GITHUB_OUTPUT
+          else
+            echo "account=530786275774" >> $GITHUB_OUTPUT
+            echo "role_arn=arn:aws:iam::530786275774:role/PCMCloudAdmin" >> $GITHUB_OUTPUT
+            echo "bucket=pcm-shared-code-530786275774" >> $GITHUB_OUTPUT
+          fi
+
+  # Get accounts list if share_accounts_key not provided
+  get-accounts:
+    needs: set-environment
+    if: inputs.share_accounts_key == ''
+    runs-on: arm-ubuntu24
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Assume role
+        run: ci/assume_role.sh ${{ needs.set-environment.outputs.role_arn }}
+
+      - name: Get accounts
+        run: |
+          export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
+          ACCOUNTS_KEY="ssm_tool/accounts_list"
+          SM_INPUT='{ "action": "start", "output": { "account": "${{ needs.set-environment.outputs.account }}", "bucket": "${{ needs.set-environment.outputs.bucket }}", "key": "'${ACCOUNTS_KEY}'" } }'
+          python3 scripts/start_state_machine.py ${{ inputs.stage }} get_accounts ssm-tool """${SM_INPUT}""" --wait
+
+  # Deploy documents
+  deploy-documents:
+    needs: [set-environment, get-accounts]
+    if: always() && (needs.get-accounts.result == 'success' || needs.get-accounts.result == 'skipped')
+    runs-on: arm-ubuntu24
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Assume role
+        run: ci/assume_role.sh ${{ needs.set-environment.outputs.role_arn }}
+
+      - name: Upload and deploy documents
+        run: |
+          bash scripts/upload_documents.sh ${{ inputs.stage }}
+          export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
+
+          # Use provided accounts key if exists
+          ACCOUNTS_KEY="${{ inputs.share_accounts_key }}"
+
+          if [[ -n "$ACCOUNTS_KEY" ]]; then
+            EVENT='{ "action": "init", "accounts_key": "'${ACCOUNTS_KEY}'" }'
+          else
+            EVENT='{ "action": "init" }'
+          fi
+
+          echo "Event: $EVENT"
+          python scripts/start_state_machine.py ${{ inputs.stage }} deploy_document ssm_tool """${EVENT}""" --wait | tee sm-result
+          grep -E -q "Success!" sm-result

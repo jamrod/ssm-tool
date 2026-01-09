@@ -1,4 +1,4 @@
-name: Detect File Changes
+name: Detect File Changes from last Commit
 on:
   workflow_call:
     inputs:

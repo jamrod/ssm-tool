@@ -1,0 +1,87 @@
+name: Main CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - dev
+      - 'pcm-**'
+
+jobs:
+  # Set environment variables based on branch
+  set-environment:
+    runs-on: arm-ubuntu24
+    outputs:
+      stage: ${{ steps.config.outputs.stage }}
+      role_arn: ${{ steps.config.outputs.role_arn }}
+    steps:
+      - name: Set deployment configuration
+        id: config
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "stage=PRD" >> $GITHUB_OUTPUT
+            echo "role_arn=arn:aws:iam::747207162522:role/PCMCloudAdmin" >> $GITHUB_OUTPUT
+          else
+            echo "stage=DEV" >> $GITHUB_OUTPUT
+            echo "role_arn=arn:aws:iam::530786275774:role/PCMCloudAdmin" >> $GITHUB_OUTPUT
+          fi
+
+  # Detect which files have changed using reusable workflow
+  detect-changes:
+    uses: ./.github/workflows/detect-changes.yml
+    with:
+      patterns: |
+        {
+          "python": "^infrastructure/|^lambdas/|^layers/|^app.py|^stage_parameters\\.json",
+          "shared-layer": "^infrastructure/ssm_shared_layer\\.py|^layers/",
+          "parameter-tool": "^infrastructure/ssm_parameter_tool_stack\\.py|^lambdas/ssm_parameter_tool/|^stage_parameters\\.json|^app.py",
+          "deploy-document-tool": "^infrastructure/ssm_deploy_document_stack\\.py|^lambdas/ssm_deploy_document_tool/|^stage_parameters\\.json|^app.py"
+        }
+
+  # Run linting if Python files changed
+  lint:
+    needs: detect-changes
+    if: fromJSON(needs.detect-changes.outputs.results).python == true
+    uses: ./.github/workflows/lint.yml
+
+  # Deploy shared layer if it changed
+  deploy-shared-layer:
+    needs: [set-environment, detect-changes, lint]
+    # Run if shared layer changed, and either linting passed or wasn't needed
+    if: |
+      always() &&
+      fromJSON(needs.detect-changes.outputs.results).shared-layer == true &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped')
+    uses: ./.github/workflows/deploy.yml
+    with:
+      stage: ${{ needs.set-environment.outputs.stage }}
+      role_arn: ${{ needs.set-environment.outputs.role_arn }}
+      stack: SsmSharedLayerStack
+
+  # Deploy parameter tool stack
+  deploy-ssm-parameter-tool:
+    needs: [set-environment, detect-changes, lint, deploy-shared-layer]
+    if: |
+      always() &&
+      fromJSON(needs.detect-changes.outputs.results).parameter-tool == true &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      (needs.deploy-shared-layer.result == 'success' || needs.deploy-shared-layer.result == 'skipped')
+    uses: ./.github/workflows/deploy.yml
+    with:
+      stage: ${{ needs.set-environment.outputs.stage }}
+      role_arn: ${{ needs.set-environment.outputs.role_arn }}
+      stack: SsmParameterToolStack
+
+  # Deploy deploy document tool stack
+  deploy-ssm-deploy-document-tool:
+    needs: [set-environment, detect-changes, lint, deploy-shared-layer]
+    if: |
+      always() &&
+      fromJSON(needs.detect-changes.outputs.results).deploy-document-tool == true &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      (needs.deploy-shared-layer.result == 'success' || needs.deploy-shared-layer.result == 'skipped')
+    uses: ./.github/workflows/deploy.yml
+    with:
+      stage: ${{ needs.set-environment.outputs.stage }}
+      role_arn: ${{ needs.set-environment.outputs.role_arn }}
+      stack: SsmDeployDocumentStack

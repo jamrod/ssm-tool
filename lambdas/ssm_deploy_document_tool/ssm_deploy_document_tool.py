@@ -200,7 +200,7 @@ class SsmToolException(Exception):
 def main(app, event: Dict[str, str]):
     """handle action"""
     res = {}
-    action = event.get("action")
+    action = event.get("action", "no-action-in-event")
     try:
         if action == "init":
             app.clean_up_s3(
@@ -221,7 +221,7 @@ def main(app, event: Dict[str, str]):
             )
             res = [{"action": "deploy", "s3_key": key} for key in job_keys]
         elif action == "deploy":
-            s3_key = event.get("s3_key")
+            s3_key = event.get("s3_key", "")
             region = s3_key[s3_key.rfind('/') + 1:]
             accounts = app.s3_utils.get_object_as_dict(
                 bucket=S3_BUCKET, key=s3_key
