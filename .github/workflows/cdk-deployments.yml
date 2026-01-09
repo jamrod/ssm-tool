@@ -6,6 +6,12 @@ on:
       - develop
       - dev
       - 'pcm-**'
+    paths:
+      - "infrastructure/**"
+      - "lambdas/**"
+      - "layers/**"
+      - "app.py"
+      - "stage_parameters.json"
 
 jobs:
   # Set environment variables based on branch
