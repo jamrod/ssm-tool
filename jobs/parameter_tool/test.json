@@ -1,6 +1,6 @@
 {
     "action": "init",
-    "job_action": "update",
+    "job_action": "create",
     "args": {
         "names_values": {
             "test_parameter": "testing123"
