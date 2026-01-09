@@ -46,12 +46,12 @@ jobs:
           # Parse the input patterns JSON
           PATTERNS='${{ inputs.patterns }}'
 
-          # Build results JSON
+          # Initialize results JSON
           RESULTS="{"
           FIRST=true
 
-          # Process each pattern
-          echo "$PATTERNS" | jq -r 'to_entries | .[] | @base64' | while read -r entry; do
+          # Process each pattern - avoid subshell by using process substitution
+          while IFS= read -r entry; do
             KEY=$(echo "$entry" | base64 -d | jq -r '.key')
             PATTERN=$(echo "$entry" | base64 -d | jq -r '.value')
 
@@ -64,14 +64,14 @@ jobs:
 
             echo "$KEY: $MATCH"
 
-            # Add to results (need to handle this differently for workflow output)
+            # Add to results
             if [ "$FIRST" = true ]; then
               RESULTS="${RESULTS}\"${KEY}\":${MATCH}"
               FIRST=false
             else
               RESULTS="${RESULTS},\"${KEY}\":${MATCH}"
             fi
-          done
+          done < <(echo "$PATTERNS" | jq -r 'to_entries | .[] | @base64')
 
           # Close JSON object
           RESULTS="${RESULTS}}"
