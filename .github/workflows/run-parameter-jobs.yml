@@ -1,4 +1,4 @@
-name: Run Parameter Store Related Jobs
+name: Run Parameter Store Jobs
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +13,7 @@ on:
 jobs:
   # Set environment configuration based on stage
   set-environment:
-    runs-on: ubuntu-latest
+    runs-on: arm-ubuntu24
     outputs:
       role_arn: ${{ steps.config.outputs.role_arn }}
     steps:
