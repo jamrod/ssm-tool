@@ -1,6 +1,4 @@
-"""Entrypoint for cdk ssm_tool
-change here to trigger deploy pipeline
-"""
+"""Entrypoint for cdk ssm_tool"""
 import json
 from aws_cdk import App, Environment, Tags
 
