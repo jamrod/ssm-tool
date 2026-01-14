@@ -44,5 +44,6 @@
             "S3_BUCKET": "pcm-shared-code-530786275774",
             "S3_ACCOUNT": "530786275774"
         }
-    }
+    },
+    "test": "trigger pipeline"
 }
