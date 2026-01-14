@@ -428,14 +428,6 @@ if __name__ == "__main__":
     # for local testing
     test_event = {"action": "run_job", "job_key": "ssm_tool/jobs/us-west-2/batch-2"}
     app_instance_ = SsmParameterTool()
-    # ssm_util_ = SsmUtilities(
-    #     Boto3Utilities().get_boto3_client(
-    #         account="119377359737",
-    #         client_type="ssm",
-    #         role_name=ROLE,
-    #         region="us-east-1",
-    #     )
-    # )
     print(main(app=app_instance_, event=test_event))
     # res_ = app_instance_.get_accounts()
     # with open("scratch/accounts.json", "w", encoding="utf-8") as writef:

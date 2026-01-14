@@ -1,15 +1,9 @@
 {
     "action": "init",
-    "job_action": "create",
+    "job_action": "remove",
     "args": {
-        "names_values": {
-            "test_parameter": "testing123"
-        },
-        "tags": [
-            {"Key": "t_environment", "Value": "DEV"},
-            {"Key": "t_AppID", "Value": "SVC02522"},
-            {"Key": "t_dcl", "Value": "1"},
-            {"Key": "test_tag", "Value": "test"}
+        "names": [
+            "test_parameter"
         ]
     }
 }

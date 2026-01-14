@@ -56,6 +56,10 @@ jobs:
       - name: Assume role
         run: ci/assume_role.sh ${{ needs.set-environment.outputs.role_arn }}
 
+      - name: Install requirements
+        run: |
+          pip install boto3 botocore
+
       - name: Get accounts
         run: |
           export PYTHONPATH=${PYTHONPATH}:$(pwd)/layers/utilities
