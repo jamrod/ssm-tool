@@ -101,5 +101,5 @@ jobs:
           fi
 
           echo "Event: $EVENT"
-          echo python scripts/start_state_machine.py ${{ inputs.stage }} deploy_document ssm_tool """${EVENT}""" --wait | tee sm-result
-          echo grep -E -q "Success!" sm-result
+          python scripts/start_state_machine.py ${{ inputs.stage }} deploy_document ssm_tool """${EVENT}""" --wait | tee sm-result
+          grep -E -q "Success!" sm-result
