@@ -58,7 +58,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          pip install boto3 botocore
+          pip install boto3 botocore boto3-type-annotations
 
       - name: Get accounts
         run: |
@@ -70,6 +70,9 @@ jobs:
   # Deploy documents
   deploy-documents:
     needs: [set-environment, get-accounts]
+    if: |
+      always() &&
+      (needs.get-accounts.result == 'success' || needs.get-accounts.result == 'skipped')
     runs-on: arm-ubuntu24
     steps:
       - name: Checkout code

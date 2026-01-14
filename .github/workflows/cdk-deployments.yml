@@ -55,7 +55,8 @@ jobs:
   deploy-shared-layer:
     needs: [set-environment, detect-changes, lint]
     # Run if shared layer changed, and either linting passed or wasn't needed
-    if: fromJSON(needs.detect-changes.outputs.results).shared-layer == true
+    if: |
+      fromJSON(needs.detect-changes.outputs.results).shared-layer == true
     uses: ./.github/workflows/deploy.yml
     with:
       stage: ${{ needs.set-environment.outputs.stage }}
@@ -65,7 +66,11 @@ jobs:
   # Deploy parameter tool stack
   deploy-ssm-parameter-tool:
     needs: [set-environment, detect-changes, lint, deploy-shared-layer]
-    if: fromJSON(needs.detect-changes.outputs.results).parameter-tool == true
+    if: |
+      always() &&
+      fromJSON(needs.detect-changes.outputs.results).parameter-tool == true &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      (needs.deploy-shared-layer.result == 'success' || needs.deploy-shared-layer.result == 'skipped')
     uses: ./.github/workflows/deploy.yml
     with:
       stage: ${{ needs.set-environment.outputs.stage }}
@@ -75,7 +80,11 @@ jobs:
   # Deploy deploy document tool stack
   deploy-ssm-deploy-document-tool:
     needs: [set-environment, detect-changes, lint, deploy-shared-layer]
-    if: fromJSON(needs.detect-changes.outputs.results).deploy-document-tool == true
+    if: |
+      always() &&
+      fromJSON(needs.detect-changes.outputs.results).deploy-document-tool == true &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      (needs.deploy-shared-layer.result == 'success' || needs.deploy-shared-layer.result == 'skipped')
     uses: ./.github/workflows/deploy.yml
     with:
       stage: ${{ needs.set-environment.outputs.stage }}
