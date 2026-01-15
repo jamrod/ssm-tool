@@ -10,9 +10,9 @@ from log_it import get_logger, log_it
 
 
 LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "info"))
-ROLE = os.environ.get("ROLE", "PCMCloudAdmin")
-ACCOUNT = os.environ.get("S3_ACCOUNT", "530786275774")
-S3_BUCKET = os.environ.get("S3_BUCKET", "pcm-shared-code-530786275774")
+ROLE = os.environ.get("ROLE", "myrole")
+ACCOUNT = os.environ.get("S3_ACCOUNT", "account1")
+S3_BUCKET = os.environ.get("S3_BUCKET", "mybucket-account1")
 
 
 class SsmShareDocumentTool:
@@ -32,7 +32,7 @@ class SsmShareDocumentTool:
         """Get the accounts to run the job in
         Accounts must be organized as json with the region as the top key with the accounts enabled for the region as a list
         {
-            "us-east-1": ["530786275774", "544625599712", "584643220196"]
+            "us-east-1": ["account1", "544625599712", "acccount"]
         }
         """
         if not accounts_key:
@@ -48,7 +48,7 @@ class SsmShareDocumentTool:
         account_list : Dict[str, list]
             list of accounts organized by enabled region, or just a dict of regions
             {
-                "us-east-1": ["530786275774", "584643220196"]
+                "us-east-1": ["account1", "acccount"]
             }
 
         Returns

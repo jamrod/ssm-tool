@@ -11,8 +11,8 @@ from log_it import get_logger, log_it
 
 LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "info"))
 ROLE = os.environ.get("ROLE", "PCMCloudAdmin")
-S3_ACCOUNT = os.environ.get("S3_ACCOUNT", "530786275774")
-S3_BUCKET = os.environ.get("S3_BUCKET", "pcm-shared-code-530786275774")
+S3_ACCOUNT = os.environ.get("S3_ACCOUNT", "account1")
+S3_BUCKET = os.environ.get("S3_BUCKET", "mybucket-account1")
 STAGE = os.environ.get("STAGE", "dev")
 
 
@@ -45,7 +45,7 @@ class SsmRunDocumentTool:
             list of ec2 instances organized by region and account
             {
                 "us-east-1": {
-                    "530786275774": ["i-01c20c9d586abe17a"],
+                    "account1": ["i-01c20c9d586abe17a"],
                     "584643220196": ["i-05b2555a3380b2279"]
             }
 

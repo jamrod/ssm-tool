@@ -8,7 +8,7 @@ from log_it import get_logger, log_it
 
 
 LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "info"))
-S3_BUCKET = os.environ.get("S3_BUCKET", "pcm-shared-code-530786275774")
+S3_BUCKET = os.environ.get("S3_BUCKET", "my-bucket-account1")
 SSM_OUTPUT_PREFIX = os.environ.get("SSM_OUTPUT_PREFIX", "ssm_tool/send_command_logs/")
 
 

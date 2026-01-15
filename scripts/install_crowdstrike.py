@@ -6,10 +6,10 @@ from aws.boto3_utilities import Boto3Utilities
 from layers.utilities.aws.s3_utilities import S3Utilities
 
 STAGE = "dev"
-S3_BUCKET = "pcm-shared-code-530786275774"
+S3_BUCKET = "mybucket-account"
 ROLE = "PCMCloudAdmin"
-ACCOUNT = "530786275774"
-INSTALLS_BUCKET = "prsn-downloadable-restricted-artifacts-us-east-1-747207162522"
+ACCOUNT = "account"
+INSTALLS_BUCKET = "prsn-downloadable-restricted-artifacts-us-east-1-account"
 
 
 def trigger_crowdstrike_install(install: str, document: str, instances_fp: str) -> bool:

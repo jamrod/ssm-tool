@@ -5,8 +5,8 @@ from log_it import get_logger, log_it
 from layers.utilities.aws.boto3_utilities import Boto3Utilities
 from layers.utilities.aws.step_function_utilities import SfnUtilities
 
-DEV_ACCOUNT = "530786275774"
-PROD_ACCOUNT = "747207162522"
+DEV_ACCOUNT = "account"
+PROD_ACCOUNT = "account"
 ROLE_NAME = "PCMCloudAdmin"
 WAIT_DELAY = 45  # time between status checks on State Machine to see if it has completed, in seconds
 MAX_WAIT = (
@@ -15,11 +15,11 @@ MAX_WAIT = (
 
 LOGGER = get_logger("LOG_LEVEL", "info")
 STATE_MACHINES = {
-    "run_document-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_run_document_SM",
-    "deploy_document-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_deploy_document_tool_SM",
-    "deploy_document-PRD": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm_ssm_deploy_document_tool_SM",
-    "get_accounts-DEV": "arn:aws:states:us-east-1:530786275774:stateMachine:pcm-ami-bakery-get-accounts",
-    "get_accounts-PRD": "arn:aws:states:us-east-1:747207162522:stateMachine:pcm-ami-bakery-get-accounts",
+    "run_document-DEV": "arn:aws:states:us-east-1:account:stateMachine:pcm_ssm_run_document_SM",
+    "deploy_document-DEV": "arn:aws:states:us-east-1:account:stateMachine:pcm_ssm_deploy_document_tool_SM",
+    "deploy_document-PRD": "arn:aws:states:us-east-1:account:stateMachine:pcm_ssm_deploy_document_tool_SM",
+    "get_accounts-DEV": "arn:aws:states:us-east-1:account:stateMachine:pcm-ami-bakery-get-accounts",
+    "get_accounts-PRD": "arn:aws:states:us-east-1:account:stateMachine:pcm-ami-bakery-get-accounts",
 }
 
 

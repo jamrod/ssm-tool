@@ -4,9 +4,8 @@ ENVMNT=$1
 
 if [[ ${ENVMNT} == "PRD" ]]
   then
-    BUCKET=pcm-shared-code-747207162522
-  else
-    BUCKET=pcm-shared-code-530786275774
+    BUCKET=my-bucket-1
+    BUCKET=my-bucket-2
 fi
 
 echo "sync ./documents with s3://${BUCKET}/ssm_tool/ssm_documents/"

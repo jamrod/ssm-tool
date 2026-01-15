@@ -11,12 +11,12 @@ from log_it import get_logger, log_it
 
 LOGGER = get_logger(os.path.basename(__file__), os.environ.get("LOG_LEVEL", "info"))
 ROLE = os.environ.get("ROLE", "PCMCloudAdmin")
-S3_ACCOUNT = os.environ.get("S3_ACCOUNT", "530786275774")
-S3_BUCKET = os.environ.get("S3_BUCKET", "pcm-shared-code-530786275774")
+S3_ACCOUNT = os.environ.get("S3_ACCOUNT", "account2")
+S3_BUCKET = os.environ.get("S3_BUCKET", "mybucket-account2")
 STAGE = os.environ.get("STAGE", "DEV")
 TAGS = [
     {"Key": "t_environment", "Value": os.environ.get("T_ENV_TAG", "DEV")},
-    {"Key": "t_AppID", "Value": "SVC02522"},
+    {"Key": "t_AppID", "Value": ""},
     {"Key": "t_dcl", "Value": "1"},
 ]
 
@@ -38,7 +38,7 @@ class SsmParameterTool:
         """Get the accounts to run the job in
         Accounts must be organized as json with the region as the top key with the accounts enabled for the region as a list
         {
-            "us-east-1": ["530786275774", "544625599712", "584643220196"]
+            "us-east-1": ["account2", "544625599712", "584643220196"]
         }
         """
         if not accounts_key:
@@ -64,7 +64,7 @@ class SsmParameterTool:
         account_list : dict
             list of accounts organized by enabled region
             {
-                "us-east-1": ["530786275774", "584643220196"]
+                "us-east-1": ["account2", "584643220196"]
             }
 
         Returns
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     app_instance_ = SsmParameterTool()
     # ssm_util_ = SsmUtilities(
     #     Boto3Utilities().get_boto3_client(
-    #         account="119377359737",
+    #         account="account1",
     #         client_type="ssm",
     #         role_name=ROLE,
     #         region="us-east-1",

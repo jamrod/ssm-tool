@@ -5,8 +5,8 @@ from layers.utilities.aws.boto3_utilities import Boto3Utilities
 from layers.utilities.aws.ssm_utilities import SsmUtilities
 
 
-DEV_ACCOUNT = "530786275774"
-PROD_ACCOUNT = "747207162522"
+DEV_ACCOUNT = "account1"
+PROD_ACCOUNT = "account2"
 ROLE_NAME = "PCMCloudAdmin"
 LOGGER = get_logger("LOG_LEVEL", "info")
 

@@ -1,48 +1,48 @@
 {
     "environment": {
-        "DEV": {"account": "530786275774", "region": "us-east-1"},
-        "PRD": {"account": "747207162522", "region": "us-east-1"}
+        "DEV": {"account": "blank", "region": "us-east-1"},
+        "PRD": {"account": "blank", "region": "us-east-1"}
     },
     "ssm_parameter_tool": {
         "PRD": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-747207162522",
+            "S3_BUCKET": "my-bucket-blank",
             "T_ENV_TAG": "PRD",
             "STAGE": "prod",
-            "S3_ACCOUNT": "747207162522"
+            "S3_ACCOUNT": "blank"
         },
         "DEV": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-530786275774",
+            "S3_BUCKET": "my-bucket-blank",
             "T_ENV_TAG": "DEV",
             "STAGE": "dev",
-            "S3_ACCOUNT": "530786275774"
+            "S3_ACCOUNT": "blank"
         }
     },
     "ssm_run_document_tool": {
         "PRD": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-747207162522",
+            "S3_BUCKET": "my-bucket-blank",
             "STAGE": "prod",
-            "S3_ACCOUNT": "747207162522"
+            "S3_ACCOUNT": "blank"
         },
         "DEV": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-530786275774",
+            "S3_BUCKET": "my-bucket-blank",
             "STAGE": "dev",
-            "S3_ACCOUNT": "530786275774"
+            "S3_ACCOUNT": "blank"
         }
     },
     "ssm_deploy_document_tool": {
         "PRD": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-747207162522",
-            "S3_ACCOUNT": "747207162522"
+            "S3_BUCKET": "my-bucket-blank",
+            "S3_ACCOUNT": "blank"
         },
         "DEV": {
             "ROLE": "PCMCloudAdmin",
-            "S3_BUCKET": "pcm-shared-code-530786275774",
-            "S3_ACCOUNT": "530786275774"
+            "S3_BUCKET": "my-bucket-blank",
+            "S3_ACCOUNT": "blank"
         }
     }
 }

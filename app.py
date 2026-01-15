@@ -47,7 +47,7 @@ SsmSharedLayerStack(
     env=Environment(**parameters["environment"][stage_name]),
 )
 
-Tags.of(app).add("t_AppID", "SVC02522")
+Tags.of(app).add("t_AppID", "")
 Tags.of(app).add("t_environment", stage_name)
 Tags.of(app).add("t_dcl", "1")
 
