@@ -13,12 +13,12 @@ The accounts lists for the tools in this repo should be formatted as a dict with
 ```
 {
   "af-south-1": [
-    "530786275774",
-    "584643220196"
+    "acct1",
+    "acct2"
   ],
   "ap-east-1": [
-    "530786275774",
-    "584643220196"
+    "acct1",
+    "acct2"
   ],
   ...
 }
@@ -28,15 +28,15 @@ The accounts lists for the tools in this repo should be formatted as a dict with
 ---------
 Add, Update or Delete Parameters to the Parameter stores across multiple regions and accounts
 
-dev-arn: arn:aws:states:us-east-1:530786275774:stateMachine:pcm_ssm_parameter_tool_SM
+dev-arn: arn:aws:states:us-east-1:acct1:stateMachine:pcm_ssm_parameter_tool_SM
 
-prod-arn: arn:aws:states:us-east-1:747207162522:stateMachine:pcm_ssm_parameter_tool_SM
+prod-arn: arn:aws:states:us-east-1:acct3:stateMachine:pcm_ssm_parameter_tool_SM
 
 ### Basic functionality
 ---------
 The SSM Parameter tool is a State Machine on AWS which accepts an event as JSON with a job to execute.
- - When a job is begun, the account_list is fetched from s3://pcm-shared-code-530786275774/ssm_tool/accounts_list
- - The accounts are then divided by region and into batches of jobs then uploaded to s3//pcm-shared-code-530786275774/ssm_tool/jobs/{region}
+ - When a job is begun, the account_list is fetched from s3://my-bucket-acct1/ssm_tool/accounts_list
+ - The accounts are then divided by region and into batches of jobs then uploaded to s3//my-bucket-acct1/ssm_tool/jobs/{region}
  - Then the State Machine will concurrently fetch batches of jobs from s3 and execute the jobs
  - The execution ends with a final error check to determine if there were any failures across any account/region
 
@@ -76,7 +76,7 @@ Create Example
         },
         "tags": [
             {"Key": "t_environment", "Value": "DEV"},
-            {"Key": "t_AppID", "Value": "SVC02522"},
+            {"Key": "t_AppID", "Value": ""},
             {"Key": "t_dcl", "Value": "1"}
         ]
     }
@@ -98,7 +98,7 @@ Update:
         },
         "tags": [
             {"Key": "t_environment", "Value": "DEV"},
-            {"Key": "t_AppID", "Value": "SVC02522"},
+            {"Key": "t_AppID", "Value": ""},
             {"Key": "t_dcl", "Value": "1"},
             {"Key": "test_tag", "Value": "test"}
         ]
@@ -124,7 +124,7 @@ Delete example:
 
 
 
-Optionally, a different account list may be provided by uploading to the pcm-shared-code-747207162522 (or 530786275774 for dev) s3 bucket and then passing the s3 key to the event as "accounts_key".
+Optionally, a different account list may be provided by uploading to the my-bucket-acct3 (or acct1 for dev) s3 bucket and then passing the s3 key to the event as "accounts_key".
 
 ## SSM Deploy Document Tool
 A tool to create or update SSM Documents across all regions and optionally share to a list of accounts.
@@ -133,8 +133,8 @@ A tool to create or update SSM Documents across all regions and optionally share
 ---------
 The SSM Deploy Document tool is a tool for deploying SSM documents across PCM Managed accounts and regions.
  - When a job is begun the contents of ./documents are uploaded to s3
-    - DEV bucket : s3://pcm-shared-code-530786275774/ssm_tool/ssm_documents/
-    - PRD bucket : s3://pcm-shared-code-747207162522/ssm_tool/ssm_documents/
+    - DEV bucket : s3://my-bucket-acct1/ssm_tool/ssm_documents/
+    - PRD bucket : s3://my-bucket-acct3/ssm_tool/ssm_documents/
  - If an accounts_key is provided, the account_list is fetched from {S3BUCKET}/{accounts_key}
  - A job is created for each region with accounts to share for that region if provided. Then the job is uploaded to {S3BUCKET}/ssm_tool/deploy_document/jobs/{region}
  - Then the State Machine will concurrently run for each region, fetching the SSM Documents from s3 and deploying to the region and sharing to accounts if they were provided.
@@ -156,7 +156,7 @@ A tool to run documents on instances
 
 ### Basic functionality
 ---------
-The SSM Run Document tool is designed to concurrently run documents on AWS EC2 instances across multiple accounts and regions. The run document tool is a State Machine on AWS which accepts an event as JSON with a job to execute. The JSON event has two top level parameters "action" which should always be "init" and "arguments". The "arguments" parameter has two parameters: "document" which is the name of the document to run and "parameters" which contains a JSON string with any parameters which need to be passed to the document. The document must exist in the account and region in which it is to be run, use the SSM Deploy Document tool to achieve this. The instance list must exist on S3 in pcm-shared-code-530786275774/ssm_tool/run_document/instance_list for dev or pcm-shared-code-747207162522/ssm_tool/run_document/instance_list for prod and should be formatted as
+The SSM Run Document tool is designed to concurrently run documents on AWS EC2 instances across multiple accounts and regions. The run document tool is a State Machine on AWS which accepts an event as JSON with a job to execute. The JSON event has two top level parameters "action" which should always be "init" and "arguments". The "arguments" parameter has two parameters: "document" which is the name of the document to run and "parameters" which contains a JSON string with any parameters which need to be passed to the document. The document must exist in the account and region in which it is to be run, use the SSM Deploy Document tool to achieve this. The instance list must exist on S3 in my-bucket-acct1/ssm_tool/run_document/instance_list for dev or my-bucket-acct3/ssm_tool/run_document/instance_list for prod and should be formatted as
 ```
 {
   "region-name": {
@@ -249,8 +249,8 @@ To test with custom scenarios:
 ### Test Configuration
 
 The `stage_parameters.json` file contains all environment-specific configuration:
-- **DEV**: Uses account `530786275774`
-- **PRD**: Uses account `747207162522`
+- **DEV**: Uses account `acct1`
+- **PRD**: Uses account `acct3`
 - **S3 Buckets**: Stage-specific bucket names
 - **IAM Roles**: Cross-account role names
 - **Environment Tags**: Environment-specific tagging
