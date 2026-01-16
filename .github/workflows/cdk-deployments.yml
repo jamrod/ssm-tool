@@ -1,17 +1,17 @@
 name: CDK Deploy and lint
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - dev
-      - 'pcm-**'
-    paths:
-      - "infrastructure/**"
-      - "lambdas/**"
-      - "layers/**"
-      - "app.py"
-      - "stage_parameters.json"
+  # push:
+  #   branches:
+  #     - main
+  #     - develop
+  #     - dev
+  #     - 'pcm-**'
+  #   paths:
+  #     - "infrastructure/**"
+  #     - "lambdas/**"
+  #     - "layers/**"
+  #     - "app.py"
+  #     - "stage_parameters.json"
 
 jobs:
   # Set environment variables based on branch
